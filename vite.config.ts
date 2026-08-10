@@ -5,23 +5,70 @@
 //     React/TanStack dedupe, error logger plugins, and sandbox detection (port/host/strictPort).
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
-import { copyFileSync, existsSync } from "node:fs";
+import { existsSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-// Nitro reescribe dist/server y deja index.mjs, pero el prerender de TanStack
-// carga dist/server/server.js. Este puente lo recrea antes del prerender.
+// Nitro reescribe dist/server y deja index.mjs (worker de Cloudflare, que espera
+// `env.ASSETS`), pero el prerender de TanStack importa dist/server/server.js y
+// llama a fetch(request) sin entorno. Este puente genera ese archivo con un
+// entorno mínimo que sirve los estáticos desde dist/client.
+const PUENTE = `import worker from "./index.mjs";
+import { readFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
+
+const clienteDir = new URL("../client/", import.meta.url);
+
+const TIPOS = {
+  ".html": "text/html; charset=utf-8",
+  ".js": "text/javascript",
+  ".css": "text/css",
+  ".json": "application/json",
+  ".svg": "image/svg+xml",
+  ".ico": "image/x-icon",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".webp": "image/webp",
+  ".woff2": "font/woff2",
+  ".txt": "text/plain; charset=utf-8",
+};
+
+const env = {
+  ASSETS: {
+    async fetch(request) {
+      const url = new URL(request.url);
+      const rel = decodeURIComponent(url.pathname.replace(/^\\/+/, ""));
+      if (!rel) return new Response(null, { status: 404 });
+      try {
+        const ruta = fileURLToPath(new URL(rel, clienteDir));
+        const datos = await readFile(ruta);
+        const ext = rel.slice(rel.lastIndexOf("."));
+        return new Response(datos, {
+          headers: { "content-type": TIPOS[ext] ?? "application/octet-stream" },
+        });
+      } catch {
+        return new Response(null, { status: 404 });
+      }
+    },
+  },
+};
+
+const ctx = { waitUntil() {}, passThroughOnException() {} };
+
+export default { fetch: (request) => worker.fetch(request, env, ctx) };
+`;
+
 const puenteEntradaServidor = {
   name: "puente-entrada-servidor-prerender",
   closeBundle: {
     order: "post" as const,
     handler() {
       const dir = resolve(process.cwd(), "dist/server");
-      const origen = resolve(dir, "index.mjs");
-      const destino = resolve(dir, "server.js");
-      if (existsSync(origen) && !existsSync(destino)) copyFileSync(origen, destino);
+      if (!existsSync(resolve(dir, "index.mjs"))) return;
+      writeFileSync(resolve(dir, "server.js"), PUENTE);
     },
   },
 };
+
 
 export default defineConfig({
   vite: {

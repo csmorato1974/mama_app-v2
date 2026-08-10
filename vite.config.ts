@@ -54,7 +54,11 @@ const env = {
 
 const ctx = { waitUntil() {}, passThroughOnException() {} };
 
-export default { fetch: (request) => worker.fetch(request, env, ctx) };
+// El prerender entrega un Request con propiedades de solo lectura que nitro
+// intenta modificar: lo normalizamos a un Request estándar.
+export default {
+  fetch: (request) => worker.fetch(new Request(request.url, request), env, ctx),
+};
 `;
 
 const puenteEntradaServidor = {

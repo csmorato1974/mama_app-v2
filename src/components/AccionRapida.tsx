@@ -169,10 +169,12 @@ export function AccionRapida({
     if (!audio) return;
     setProcesando(true);
     try {
-      const { texto } = await transcribirNota({
+      const { texto, aviso } = await transcribirNota({
         data: { audioBase64: audio.base64, mimeType: audio.mimeType },
       });
+      if (aviso) toast.warning(aviso);
       setTranscripcion(texto);
+
       if (texto.trim()) {
         const resultado = await interpretarRegistro({ data: { texto } });
         setInterpretado(resultado);

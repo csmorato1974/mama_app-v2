@@ -155,19 +155,21 @@ function Auth() {
                     onChange={(e) => setCorreo(e.target.value)}
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="clave">Contraseña</Label>
-                  <Input
-                    id="clave"
-                    type="password"
-                    autoComplete="current-password"
-                    value={clave}
-                    onChange={(e) => setClave(e.target.value)}
-                  />
-                </div>
+                <CampoClave id="clave" valor={clave} onCambio={setClave} />
                 <Button className="w-full" onClick={entrar} disabled={cargando || !correo || !clave}>
                   {cargando ? <Loader2 className="size-4 animate-spin" /> : "Entrar"}
                 </Button>
+                <button
+                  type="button"
+                  className="w-full text-center text-xs font-medium text-primary underline-offset-4 hover:underline"
+                  onClick={() => {
+                    setCorreoRecuperacion(correo);
+                    setRecuperacionAbierta(true);
+                  }}
+                >
+                  ¿Olvidaste tu contraseña?
+                </button>
+
               </TabsContent>
 
               <TabsContent value="crear" className="space-y-3 pt-4">

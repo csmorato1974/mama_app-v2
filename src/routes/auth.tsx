@@ -219,7 +219,45 @@ function Auth() {
             </Button>
           </CardContent>
         </Card>
+
+        <Dialog open={recuperacionAbierta} onOpenChange={setRecuperacionAbierta}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle>Recuperar contraseña</DialogTitle>
+              <DialogDescription>
+                Indica el correo vinculado a tu cuenta. Te enviaremos un enlace de un solo uso y con
+                caducidad para establecer una contraseña nueva.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-1.5">
+              <Label htmlFor="correo-recuperacion">Correo</Label>
+              <Input
+                id="correo-recuperacion"
+                type="email"
+                autoComplete="email"
+                value={correoRecuperacion}
+                onChange={(e) => setCorreoRecuperacion(e.target.value)}
+              />
+            </div>
+            <DialogFooter className="gap-2 sm:gap-2">
+              <Button variant="outline" onClick={() => setRecuperacionAbierta(false)}>
+                Cancelar
+              </Button>
+              <Button
+                onClick={recuperar}
+                disabled={enviandoRecuperacion || !correoRecuperacion.includes("@")}
+              >
+                {enviandoRecuperacion ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  "Enviar enlace"
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
+
     </div>
   );
 }

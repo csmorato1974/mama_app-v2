@@ -14,10 +14,10 @@ export function Metrica({
 }: {
   etiqueta: string;
   valor: string | number;
-  unidad?: string;
-  ayuda?: string;
-  estado?: "neutro" | "bien" | "atencion" | "riesgo";
-  icono?: ReactNode;
+  unidad?: string | undefined;
+  ayuda?: string | undefined;
+  estado?: "neutro" | "bien" | "atencion" | "riesgo" | undefined;
+  icono?: ReactNode | undefined;
 }) {
   const colores = {
     neutro: "text-foreground",

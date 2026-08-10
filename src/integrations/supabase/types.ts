@@ -120,6 +120,101 @@ export type Database = {
           },
         ]
       }
+      ai_config: {
+        Row: {
+          created_at: string
+          ia_activa: boolean
+          id: boolean
+          limite_diario_global: number
+          limite_diario_usuario: number
+          limite_mensual_global: number
+          limite_mensual_usuario: number
+          modelo: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          ia_activa?: boolean
+          id?: boolean
+          limite_diario_global?: number
+          limite_diario_usuario?: number
+          limite_mensual_global?: number
+          limite_mensual_usuario?: number
+          modelo?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          ia_activa?: boolean
+          id?: boolean
+          limite_diario_global?: number
+          limite_diario_usuario?: number
+          limite_mensual_global?: number
+          limite_mensual_usuario?: number
+          modelo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ai_usage_log: {
+        Row: {
+          coste_estimado_usd: number
+          created_at: string
+          error_codigo: string | null
+          estado: string
+          funcion: string
+          id: string
+          latencia_ms: number
+          modelo: string
+          paciente_id: string | null
+          request_id: string | null
+          tokens_entrada: number
+          tokens_salida: number
+          tokens_total: number
+          usuario_id: string | null
+        }
+        Insert: {
+          coste_estimado_usd?: number
+          created_at?: string
+          error_codigo?: string | null
+          estado?: string
+          funcion: string
+          id?: string
+          latencia_ms?: number
+          modelo: string
+          paciente_id?: string | null
+          request_id?: string | null
+          tokens_entrada?: number
+          tokens_salida?: number
+          tokens_total?: number
+          usuario_id?: string | null
+        }
+        Update: {
+          coste_estimado_usd?: number
+          created_at?: string
+          error_codigo?: string | null
+          estado?: string
+          funcion?: string
+          id?: string
+          latencia_ms?: number
+          modelo?: string
+          paciente_id?: string | null
+          request_id?: string | null
+          tokens_entrada?: number
+          tokens_salida?: number
+          tokens_total?: number
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_usage_log_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "pacientes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       auditoria: {
         Row: {
           accion: string

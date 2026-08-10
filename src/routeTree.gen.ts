@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAgendaRouteImport } from './routes/_authenticated/agenda'
 import { Route as AuthenticatedDialisisRouteImport } from './routes/_authenticated/dialisis'
 import { Route as AuthenticatedDirectorioRouteImport } from './routes/_authenticated/directorio'
+import { Route as AuthenticatedDocumentosRouteImport } from './routes/_authenticated/documentos'
 import { Route as AuthenticatedHistorialRouteImport } from './routes/_authenticated/historial'
 import { Route as AuthenticatedInicioRouteImport } from './routes/_authenticated/inicio'
 import { Route as AuthenticatedInventarioRouteImport } from './routes/_authenticated/inventario'
@@ -52,6 +53,11 @@ const AuthenticatedDialisisRoute = AuthenticatedDialisisRouteImport.update({
 const AuthenticatedDirectorioRoute = AuthenticatedDirectorioRouteImport.update({
   id: '/directorio',
   path: '/directorio',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDocumentosRoute = AuthenticatedDocumentosRouteImport.update({
+  id: '/documentos',
+  path: '/documentos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedHistorialRoute = AuthenticatedHistorialRouteImport.update({
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/agenda': typeof AuthenticatedAgendaRoute
   '/dialisis': typeof AuthenticatedDialisisRoute
   '/directorio': typeof AuthenticatedDirectorioRoute
+  '/documentos': typeof AuthenticatedDocumentosRoute
   '/historial': typeof AuthenticatedHistorialRoute
   '/inicio': typeof AuthenticatedInicioRoute
   '/inventario': typeof AuthenticatedInventarioRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/agenda': typeof AuthenticatedAgendaRoute
   '/dialisis': typeof AuthenticatedDialisisRoute
   '/directorio': typeof AuthenticatedDirectorioRoute
+  '/documentos': typeof AuthenticatedDocumentosRoute
   '/historial': typeof AuthenticatedHistorialRoute
   '/inicio': typeof AuthenticatedInicioRoute
   '/inventario': typeof AuthenticatedInventarioRoute
@@ -141,6 +149,7 @@ export interface FileRoutesById {
   '/_authenticated/agenda': typeof AuthenticatedAgendaRoute
   '/_authenticated/dialisis': typeof AuthenticatedDialisisRoute
   '/_authenticated/directorio': typeof AuthenticatedDirectorioRoute
+  '/_authenticated/documentos': typeof AuthenticatedDocumentosRoute
   '/_authenticated/historial': typeof AuthenticatedHistorialRoute
   '/_authenticated/inicio': typeof AuthenticatedInicioRoute
   '/_authenticated/inventario': typeof AuthenticatedInventarioRoute
@@ -159,6 +168,7 @@ export interface FileRouteTypes {
     | '/agenda'
     | '/dialisis'
     | '/directorio'
+    | '/documentos'
     | '/historial'
     | '/inicio'
     | '/inventario'
@@ -175,6 +185,7 @@ export interface FileRouteTypes {
     | '/agenda'
     | '/dialisis'
     | '/directorio'
+    | '/documentos'
     | '/historial'
     | '/inicio'
     | '/inventario'
@@ -192,6 +203,7 @@ export interface FileRouteTypes {
     | '/_authenticated/agenda'
     | '/_authenticated/dialisis'
     | '/_authenticated/directorio'
+    | '/_authenticated/documentos'
     | '/_authenticated/historial'
     | '/_authenticated/inicio'
     | '/_authenticated/inventario'
@@ -251,6 +263,13 @@ declare module '@tanstack/react-router' {
       path: '/directorio'
       fullPath: '/directorio'
       preLoaderRoute: typeof AuthenticatedDirectorioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/documentos': {
+      id: '/_authenticated/documentos'
+      path: '/documentos'
+      fullPath: '/documentos'
+      preLoaderRoute: typeof AuthenticatedDocumentosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/historial': {
@@ -323,6 +342,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAgendaRoute: typeof AuthenticatedAgendaRoute
   AuthenticatedDialisisRoute: typeof AuthenticatedDialisisRoute
   AuthenticatedDirectorioRoute: typeof AuthenticatedDirectorioRoute
+  AuthenticatedDocumentosRoute: typeof AuthenticatedDocumentosRoute
   AuthenticatedHistorialRoute: typeof AuthenticatedHistorialRoute
   AuthenticatedInicioRoute: typeof AuthenticatedInicioRoute
   AuthenticatedInventarioRoute: typeof AuthenticatedInventarioRoute
@@ -338,6 +358,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAgendaRoute: AuthenticatedAgendaRoute,
   AuthenticatedDialisisRoute: AuthenticatedDialisisRoute,
   AuthenticatedDirectorioRoute: AuthenticatedDirectorioRoute,
+  AuthenticatedDocumentosRoute: AuthenticatedDocumentosRoute,
   AuthenticatedHistorialRoute: AuthenticatedHistorialRoute,
   AuthenticatedInicioRoute: AuthenticatedInicioRoute,
   AuthenticatedInventarioRoute: AuthenticatedInventarioRoute,
@@ -360,13 +381,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

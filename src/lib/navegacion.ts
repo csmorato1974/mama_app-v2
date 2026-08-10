@@ -164,7 +164,32 @@ export const NAV: NavItem[] = [
     descripcion: "Consultas sobre el historial de la paciente",
     grupo: "asistencia",
   },
+  {
+    to: "/paciente",
+    label: "Ficha de la paciente",
+    corto: "Ficha",
+    icon: IdCard,
+    descripcion: "Datos personales, contacto, diagnóstico y preferencias",
+    grupo: "gestion",
+  },
+  {
+    to: "/perfil",
+    label: "Mi perfil",
+    corto: "Perfil",
+    icon: UserCircle,
+    descripcion: "Tus datos de contacto y tu acceso",
+    grupo: "asistencia",
+  },
+  {
+    to: "/usuarios",
+    label: "Usuarios y accesos",
+    corto: "Usuarios",
+    icon: ShieldCheck,
+    descripcion: "Roles, aprobaciones y estado de cuenta (administración)",
+    grupo: "asistencia",
+  },
 ];
+
 
 export const NAV_MOVIL = ["/inicio", "/agenda", "/salud", "/dialisis"];
 

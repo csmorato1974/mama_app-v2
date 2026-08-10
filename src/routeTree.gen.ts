@@ -32,6 +32,7 @@ import { Route as AuthenticatedNutricionRouteImport } from './routes/_authentica
 import { Route as AuthenticatedPacienteRouteImport } from './routes/_authenticated/paciente'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AuthenticatedSaludRouteImport } from './routes/_authenticated/salud'
+import { Route as AuthenticatedUsuariosRouteImport } from './routes/_authenticated/usuarios'
 import { Route as AuthenticatedWearableRouteImport } from './routes/_authenticated/wearable'
 
 const IndexRoute = IndexRouteImport.update({
@@ -149,6 +150,11 @@ const AuthenticatedSaludRoute = AuthenticatedSaludRouteImport.update({
   path: '/salud',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedUsuariosRoute = AuthenticatedUsuariosRouteImport.update({
+  id: '/usuarios',
+  path: '/usuarios',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedWearableRoute = AuthenticatedWearableRouteImport.update({
   id: '/wearable',
   path: '/wearable',
@@ -178,6 +184,7 @@ export interface FileRoutesByFullPath {
   '/paciente': typeof AuthenticatedPacienteRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/salud': typeof AuthenticatedSaludRoute
+  '/usuarios': typeof AuthenticatedUsuariosRoute
   '/wearable': typeof AuthenticatedWearableRoute
 }
 export interface FileRoutesByTo {
@@ -203,6 +210,7 @@ export interface FileRoutesByTo {
   '/paciente': typeof AuthenticatedPacienteRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/salud': typeof AuthenticatedSaludRoute
+  '/usuarios': typeof AuthenticatedUsuariosRoute
   '/wearable': typeof AuthenticatedWearableRoute
 }
 export interface FileRoutesById {
@@ -230,6 +238,7 @@ export interface FileRoutesById {
   '/_authenticated/paciente': typeof AuthenticatedPacienteRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/_authenticated/salud': typeof AuthenticatedSaludRoute
+  '/_authenticated/usuarios': typeof AuthenticatedUsuariosRoute
   '/_authenticated/wearable': typeof AuthenticatedWearableRoute
 }
 export interface FileRouteTypes {
@@ -257,6 +266,7 @@ export interface FileRouteTypes {
     | '/paciente'
     | '/perfil'
     | '/salud'
+    | '/usuarios'
     | '/wearable'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -282,6 +292,7 @@ export interface FileRouteTypes {
     | '/paciente'
     | '/perfil'
     | '/salud'
+    | '/usuarios'
     | '/wearable'
   id:
     | '__root__'
@@ -308,6 +319,7 @@ export interface FileRouteTypes {
     | '/_authenticated/paciente'
     | '/_authenticated/perfil'
     | '/_authenticated/salud'
+    | '/_authenticated/usuarios'
     | '/_authenticated/wearable'
   fileRoutesById: FileRoutesById
 }
@@ -481,6 +493,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSaludRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/usuarios': {
+      id: '/_authenticated/usuarios'
+      path: '/usuarios'
+      fullPath: '/usuarios'
+      preLoaderRoute: typeof AuthenticatedUsuariosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/wearable': {
       id: '/_authenticated/wearable'
       path: '/wearable'
@@ -511,6 +530,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPacienteRoute: typeof AuthenticatedPacienteRoute
   AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
   AuthenticatedSaludRoute: typeof AuthenticatedSaludRoute
+  AuthenticatedUsuariosRoute: typeof AuthenticatedUsuariosRoute
   AuthenticatedWearableRoute: typeof AuthenticatedWearableRoute
 }
 
@@ -534,6 +554,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPacienteRoute: AuthenticatedPacienteRoute,
   AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
   AuthenticatedSaludRoute: AuthenticatedSaludRoute,
+  AuthenticatedUsuariosRoute: AuthenticatedUsuariosRoute,
   AuthenticatedWearableRoute: AuthenticatedWearableRoute,
 }
 

@@ -1,6 +1,6 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { toast } from "sonner";
 
@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { useGastos } from "@/hooks/useCuidados";
+import { useSesion } from "@/hooks/useSesion";
 import { supabase } from "@/integrations/supabase/client";
 import { ISO_HOY, bolivianos, capitalizar, fechaCorta } from "@/lib/format";
 
@@ -32,7 +33,29 @@ export const Route = createFileRoute("/_authenticated/gastos")({
   component: Gastos,
 });
 
-function NuevoGasto() {
+type Persona = { id: string; nombre: string };
+
+function usePersonasGasto() {
+  return useQuery({
+    queryKey: ["personas-gasto"],
+    queryFn: async (): Promise<Persona[]> => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, nombre")
+        .order("nombre", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as Persona[];
+    },
+  });
+}
+
+function NuevoGasto({
+  personas,
+  usuarioActualId,
+}: {
+  personas: Persona[];
+  usuarioActualId: string | null;
+}) {
   const queryClient = useQueryClient();
   const [abierta, setAbierta] = useState(false);
   const [form, setForm] = useState({
@@ -42,7 +65,14 @@ function NuevoGasto() {
     importe: "",
     proveedor: "",
     notas: "",
+    realizadoPor: "",
   });
+
+  useEffect(() => {
+    if (usuarioActualId && !form.realizadoPor) {
+      setForm((actual) => ({ ...actual, realizadoPor: usuarioActualId }));
+    }
+  }, [usuarioActualId, form.realizadoPor]);
 
   const guardar = useMutation({
     mutationFn: async () => {
@@ -56,6 +86,8 @@ function NuevoGasto() {
         proveedor: form.proveedor || null,
         notas: form.notas || null,
         moneda: "BOB",
+        created_by: usuarioActualId,
+        realizado_por: form.realizadoPor || null,
       });
       if (error) throw error;
     },
@@ -119,6 +151,22 @@ function NuevoGasto() {
               onChange={(e) => setForm({ ...form, proveedor: e.target.value })}
             />
           </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="realizadoPor">Quién hizo el gasto</Label>
+            <select
+              id="realizadoPor"
+              value={form.realizadoPor}
+              onChange={(e) => setForm({ ...form, realizadoPor: e.target.value })}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+            >
+              <option value="">No especificado</option>
+              {personas.map((persona) => (
+                <option key={persona.id} value={persona.id}>
+                  {persona.id === usuarioActualId ? `${persona.nombre} (yo)` : persona.nombre}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className="col-span-2 space-y-1.5">
             <Label htmlFor="notas">Notas</Label>
             <Textarea id="notas" value={form.notas} onChange={(e) => setForm({ ...form, notas: e.target.value })} />
@@ -134,6 +182,9 @@ function NuevoGasto() {
 
 function Gastos() {
   const { data: gastos, isLoading } = useGastos();
+  const { user } = useSesion();
+  const { data: personas } = usePersonasGasto();
+  const nombres = new Map((personas ?? []).map((persona) => [persona.id, persona.nombre]));
   const mesActual = new Date().toISOString().slice(0, 7);
 
   const totalMes = (gastos ?? [])
@@ -153,7 +204,7 @@ function Gastos() {
     .slice(0, 8);
 
   return (
-    <AppShell titulo="Gastos" descripcion="Control económico en bolivianos" acciones={<NuevoGasto />}>
+    <AppShell titulo="Gastos" descripcion="Control económico en bolivianos" acciones={<NuevoGasto personas={personas ?? []} usuarioActualId={user?.id ?? null} />}>
       <div className="space-y-6">
         <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           <Metrica etiqueta="Gasto del mes" valor={bolivianos(totalMes)} />
@@ -193,6 +244,10 @@ function Gastos() {
                   <p className="truncate text-sm font-medium">{g.concepto}</p>
                   <p className="truncate text-xs text-muted-foreground">
                     {[fechaCorta(g.fecha), capitalizar(g.categoria), g.proveedor].filter(Boolean).join(" · ")}
+                  </p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    Registró: {nombres.get(g.created_by ?? "") ?? "Usuario no disponible"} · Realizó:{" "}
+                    {nombres.get(g.realizado_por ?? "") ?? "No especificado"}
                   </p>
                 </div>
                 <div className="shrink-0 text-right">

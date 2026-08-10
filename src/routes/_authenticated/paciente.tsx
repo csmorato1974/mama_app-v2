@@ -24,6 +24,7 @@ import { PACIENTE_ID, usePaciente } from "@/hooks/useCuidados";
 import { useRol } from "@/hooks/useSesion";
 import { supabase } from "@/integrations/supabase/client";
 import { camposModificados, puedeEditarPaciente, validarPaciente } from "@/lib/permisos";
+import { registrarAuditoria } from "@/lib/auditoria";
 
 export const Route = createFileRoute("/_authenticated/paciente")({
   head: () => ({
@@ -138,6 +139,12 @@ function Paciente() {
       toast.error("No se pudo guardar. Puede que tu rol no tenga permiso de edición.");
       return;
     }
+    void registrarAuditoria({
+      tabla: "pacientes",
+      accion: "actualizar",
+      registroId: PACIENTE_ID,
+      campos: cambiados,
+    });
     void qc.invalidateQueries({ queryKey: ["paciente"] });
     void qc.invalidateQueries({ queryKey: ["auditoria"] });
     toast.success(`Ficha actualizada (${cambiados.length} campos). El cambio quedó registrado en auditoría.`);

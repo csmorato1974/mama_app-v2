@@ -48,6 +48,22 @@ function Auth() {
   const [correo, setCorreo] = useState("");
   const [clave, setClave] = useState("");
   const [nombre, setNombre] = useState("");
+  const [recuperacionAbierta, setRecuperacionAbierta] = useState(false);
+  const [correoRecuperacion, setCorreoRecuperacion] = useState("");
+  const [enviandoRecuperacion, setEnviandoRecuperacion] = useState(false);
+
+  async function recuperar() {
+    setEnviandoRecuperacion(true);
+    await supabase.auth.resetPasswordForEmail(correoRecuperacion.trim(), {
+      redirectTo: `${window.location.origin}/restablecer`,
+    });
+    setEnviandoRecuperacion(false);
+    setRecuperacionAbierta(false);
+    setCorreoRecuperacion("");
+    // Mensaje genérico: no revelamos si el correo existe.
+    toast.success(MENSAJE_RECUPERACION);
+  }
+
 
   useEffect(() => {
     if (session) navigate({ to: "/inicio", replace: true });

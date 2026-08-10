@@ -46,7 +46,7 @@ export const estadoIA = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { consumo, costeDelMes, leerConfig, rolesDeUsuario } = await import("./ia-openai.server");
-    const { claveConfigurada } = await import("./openai.server");
+    const { claveConfigurada, MODELO_TRANSCRIPCION, PROVEEDORES } = await import("./openai.server");
 
     const roles = await rolesDeUsuario(context.supabase, context.userId);
     const config = await leerConfig();
@@ -54,6 +54,13 @@ export const estadoIA = createServerFn({ method: "POST" })
     return {
       configurada: claveConfigurada(),
       proveedor: "OpenAI (API propia)",
+      // Comprobación visible: proveedor real de cada función de IA.
+      proveedores: PROVEEDORES.map((p) => ({
+        funcion: p.funcion,
+        etiqueta: p.etiqueta,
+        proveedor: p.proveedor,
+        modelo: p.funcion === "voz" ? MODELO_TRANSCRIPCION : config.modelo,
+      })),
       roles,
       config,
       consumo: await consumo(context.userId),

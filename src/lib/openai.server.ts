@@ -116,7 +116,10 @@ export async function llamarOpenAI(opciones: {
     body: JSON.stringify({
       model: opciones.modelo,
       instructions: opciones.instrucciones,
-      input: opciones.entrada,
+      input: opciones.bloques
+        ? [{ role: "user", content: opciones.bloques }]
+        : opciones.entrada,
+
       max_output_tokens: opciones.maxTokens ?? 1200,
       store: false,
     }),

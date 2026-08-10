@@ -209,7 +209,7 @@ export async function ejecutarIA(opciones: {
       modelo: config.modelo,
       instrucciones: opciones.instrucciones,
       entrada: opciones.entrada,
-      maxTokens: opciones.maxTokens,
+      ...(opciones.maxTokens === undefined ? {} : { maxTokens: opciones.maxTokens }),
     });
 
     await registrar({

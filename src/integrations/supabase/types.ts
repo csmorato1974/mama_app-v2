@@ -620,13 +620,6 @@ export type Database = {
             referencedRelation: "documentos"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "gastos_realizado_por_fkey"
-            columns: ["realizado_por"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
         ]
       }
       inventario: {

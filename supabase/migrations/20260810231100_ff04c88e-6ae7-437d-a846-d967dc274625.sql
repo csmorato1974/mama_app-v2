@@ -1,0 +1,1 @@
+ALTER TABLE public.gastos ADD COLUMN IF NOT EXISTS realizado_por uuid REFERENCES auth.users(id) ON DELETE SET NULL;

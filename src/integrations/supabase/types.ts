@@ -782,8 +782,13 @@ export type Database = {
       pacientes: {
         Row: {
           alergias: string | null
+          ciudad: string | null
+          contacto_emergencia_nombre: string | null
+          contacto_emergencia_telefono: string | null
+          correo: string | null
           created_at: string
           diagnostico_principal: string | null
+          direccion: string | null
           documento: string | null
           fecha_nacimiento: string | null
           grupo_sanguineo: string | null
@@ -791,13 +796,22 @@ export type Database = {
           modalidad_dialisis: string | null
           nombre: string
           notas: string | null
+          notas_asistenciales: string | null
           peso_seco: number | null
+          preferencias: string | null
+          resumen_clinico: string | null
+          telefono: string | null
           updated_at: string
         }
         Insert: {
           alergias?: string | null
+          ciudad?: string | null
+          contacto_emergencia_nombre?: string | null
+          contacto_emergencia_telefono?: string | null
+          correo?: string | null
           created_at?: string
           diagnostico_principal?: string | null
+          direccion?: string | null
           documento?: string | null
           fecha_nacimiento?: string | null
           grupo_sanguineo?: string | null
@@ -805,13 +819,22 @@ export type Database = {
           modalidad_dialisis?: string | null
           nombre: string
           notas?: string | null
+          notas_asistenciales?: string | null
           peso_seco?: number | null
+          preferencias?: string | null
+          resumen_clinico?: string | null
+          telefono?: string | null
           updated_at?: string
         }
         Update: {
           alergias?: string | null
+          ciudad?: string | null
+          contacto_emergencia_nombre?: string | null
+          contacto_emergencia_telefono?: string | null
+          correo?: string | null
           created_at?: string
           diagnostico_principal?: string | null
+          direccion?: string | null
           documento?: string | null
           fecha_nacimiento?: string | null
           grupo_sanguineo?: string | null
@@ -819,33 +842,49 @@ export type Database = {
           modalidad_dialisis?: string | null
           nombre?: string
           notas?: string | null
+          notas_asistenciales?: string | null
           peso_seco?: number | null
+          preferencias?: string | null
+          resumen_clinico?: string | null
+          telefono?: string | null
           updated_at?: string
         }
         Relationships: []
       }
       profiles: {
         Row: {
+          activo: boolean
+          aprobado: boolean
           avatar_url: string | null
+          correo: string | null
           created_at: string
           id: string
           nombre: string
+          relacion: string | null
           telefono: string | null
           updated_at: string
         }
         Insert: {
+          activo?: boolean
+          aprobado?: boolean
           avatar_url?: string | null
+          correo?: string | null
           created_at?: string
           id: string
           nombre?: string
+          relacion?: string | null
           telefono?: string | null
           updated_at?: string
         }
         Update: {
+          activo?: boolean
+          aprobado?: boolean
           avatar_url?: string | null
+          correo?: string | null
           created_at?: string
           id?: string
           nombre?: string
+          relacion?: string | null
           telefono?: string | null
           updated_at?: string
         }

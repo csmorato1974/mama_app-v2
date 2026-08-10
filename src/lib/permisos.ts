@@ -52,12 +52,12 @@ export function camposModificados<T extends Record<string, unknown>>(antes: T, d
 
 export function validarPerfil(valores: { nombre: string; telefono?: string; correo?: string }) {
   const errores: Record<string, string> = {};
-  if (valores.nombre.trim().length < 3) errores.nombre = "Indica nombre y apellido (mínimo 3 caracteres).";
-  if (valores.nombre.trim().length > 120) errores.nombre = "Máximo 120 caracteres.";
+  if (valores.nombre.trim().length < 3) errores['nombre'] = "Indica nombre y apellido (mínimo 3 caracteres).";
+  if (valores.nombre.trim().length > 120) errores['nombre'] = "Máximo 120 caracteres.";
   if (valores.telefono && !/^[+\d\s()-]{6,20}$/.test(valores.telefono.trim()))
-    errores.telefono = "Teléfono no válido.";
+    errores['telefono'] = "Teléfono no válido.";
   if (valores.correo && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(valores.correo.trim()))
-    errores.correo = "Correo no válido.";
+    errores['correo'] = "Correo no válido.";
   return errores;
 }
 
@@ -68,14 +68,14 @@ export function validarPaciente(valores: {
   peso_seco?: string | null;
 }) {
   const errores: Record<string, string> = {};
-  if (valores.nombre.trim().length < 3) errores.nombre = "El nombre es obligatorio.";
+  if (valores.nombre.trim().length < 3) errores['nombre'] = "El nombre es obligatorio.";
   if (valores.telefono && !/^[+\d\s()-]{6,20}$/.test(valores.telefono.trim()))
-    errores.telefono = "Teléfono no válido.";
+    errores['telefono'] = "Teléfono no válido.";
   if (valores.correo && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(valores.correo.trim()))
-    errores.correo = "Correo no válido.";
+    errores['correo'] = "Correo no válido.";
   if (valores.peso_seco) {
     const peso = Number(valores.peso_seco);
-    if (!Number.isFinite(peso) || peso <= 0 || peso > 300) errores.peso_seco = "Peso seco entre 1 y 300 kg.";
+    if (!Number.isFinite(peso) || peso <= 0 || peso > 300) errores['peso_seco'] = "Peso seco entre 1 y 300 kg.";
   }
   return errores;
 }

@@ -187,16 +187,13 @@ function Auth() {
                     onChange={(e) => setCorreo(e.target.value)}
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="clave2">Contraseña</Label>
-                  <Input
-                    id="clave2"
-                    type="password"
-                    autoComplete="new-password"
-                    value={clave}
-                    onChange={(e) => setClave(e.target.value)}
-                  />
-                </div>
+                <CampoClave
+                  id="clave2"
+                  valor={clave}
+                  onCambio={setClave}
+                  autoComplete="new-password"
+                  ayuda="Mínimo 8 caracteres."
+                />
                 <Button
                   className="w-full"
                   onClick={registrar}
@@ -205,9 +202,10 @@ function Auth() {
                   {cargando ? <Loader2 className="size-4 animate-spin" /> : "Crear cuenta"}
                 </Button>
                 <p className="text-xs text-muted-foreground">
-                  La primera cuenta creada recibe el rol de administración; el resto entra como
-                  familiar y puede ajustarse después.
+                  La primera cuenta creada recibe el rol de administración. El resto queda pendiente de
+                  aprobación por administración antes de ver los datos del cuidado.
                 </p>
+
               </TabsContent>
             </Tabs>
 

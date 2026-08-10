@@ -73,7 +73,9 @@ export const actualizarConfigIA = createServerFn({ method: "POST" })
       return { ok: false as const, mensaje: "Solo un administrador puede cambiar la configuración de IA." };
     }
 
-    const cambios = Object.fromEntries(Object.entries(data).filter(([, v]) => v !== undefined));
+    const cambios = Object.fromEntries(
+      Object.entries(data).filter(([, v]) => v !== undefined),
+    ) as { ia_activa?: boolean; modelo?: string };
     const { error } = await context.supabase.from("ai_config").update(cambios).eq("id", true);
     if (error) return { ok: false as const, mensaje: "No se pudo guardar la configuración." };
 

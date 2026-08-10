@@ -575,7 +575,6 @@ export type Database = {
           moneda: string
           notas: string | null
           proveedor: string | null
-          realizado_por: string | null
           updated_at: string
         }
         Insert: {
@@ -592,7 +591,6 @@ export type Database = {
           moneda?: string
           notas?: string | null
           proveedor?: string | null
-          realizado_por?: string | null
           updated_at?: string
         }
         Update: {
@@ -609,7 +607,6 @@ export type Database = {
           moneda?: string
           notas?: string | null
           proveedor?: string | null
-          realizado_por?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -618,13 +615,6 @@ export type Database = {
             columns: ["documento_id"]
             isOneToOne: false
             referencedRelation: "documentos"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "gastos_realizado_por_fkey"
-            columns: ["realizado_por"]
-            isOneToOne: false
-            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

@@ -75,97 +75,135 @@ const EntradaInforme = z.object({
   contexto: z.string().min(1),
 });
 
+// Voz: transcripción con la API propia de OpenAI (nunca Lovable AI).
 export const transcribirNota = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((entrada: unknown) => EntradaVoz.parse(entrada))
-  .handler(async ({ data }) => {
-    const { transcribir } = await import("./ia.server");
-    const texto = await transcribir(data.audioBase64, data.mimeType);
-    return { texto };
+  .handler(async ({ data, context }) => {
+    const { ejecutarVoz, ErrorIA } = await import("./ia-openai.server");
+    try {
+      const resultado = await ejecutarVoz({
+        cliente: context.supabase,
+        userId: context.userId,
+        audioBase64: data.audioBase64,
+        mimeType: data.mimeType,
+      });
+      return { texto: resultado.texto, aviso: null as string | null };
+    } catch (error) {
+      if (error instanceof ErrorIA) return { texto: "", aviso: error.message };
+      throw error;
+    }
   });
 
+// Interpretación de la nota dictada: API propia de OpenAI.
 export const interpretarRegistro = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((entrada: unknown) => EntradaTexto.parse(entrada))
-  .handler(async ({ data }) => {
-    const { chatIA, extraerJson } = await import("./ia.server");
+  .handler(async ({ data, context }) => {
+    const { ejecutarIA, ErrorIA } = await import("./ia-openai.server");
+    const { extraerJson } = await import("./openai.server");
     const hoy = new Date().toISOString().slice(0, 10);
 
-    const respuesta = await chatIA({
-      json: true,
-      system: [
-        "Eres un asistente clínico que convierte notas dictadas por cuidadores en registros estructurados.",
-        "La paciente es una mujer mayor con enfermedad renal crónica en diálisis peritoneal (DPCA, 4 intercambios).",
-        `La fecha de hoy es ${hoy}.`,
-        "Devuelve SOLO un objeto JSON con esta forma:",
-        '{"modulo":"constantes|dialisis|medicacion|gasto|actividad|nota","resumen":"frase breve en español",',
-        '"constantes":{"presion_sistolica":num,"presion_diastolica":num,"frecuencia_cardiaca":num,"saturacion":num,',
-        '"temperatura":num,"peso":num,"glucemia":num,"ingesta_liquidos_ml":num,"diuresis_ml":num,"dolor":num,',
-        '"edema":"texto","apetito":"texto","descanso":"texto","sintomas":["texto"],"observaciones":"texto"},',
-        '"dialisis":{"fecha":"YYYY-MM-DD","concentracion":"texto","numero_bolsas":num,"volumen_infundido_ml":num,',
-        '"volumen_drenado_ml":num,"ultrafiltracion_ml":num,"aspecto_liquido":"claro|turbio|con fibrina",',
-        '"incidencias":"texto","observaciones":"texto"},',
-        '"gasto":{"fecha":"YYYY-MM-DD","categoria":"medicamentos|laboratorio|medicos|enfermeria|transporte|alimentacion|suministros|dialisis|tramites|otros","concepto":"texto","proveedor":"texto","importe":num},',
-        '"actividad":{"fecha":"YYYY-MM-DD","hora":"HH:MM","tipo":"consulta|analitica|entrega_suministros|tramite|visita_enfermeria|otro","titulo":"texto","lugar":"texto","notas":"texto"},',
-        '"nota":{"titulo":"texto","descripcion":"texto","categoria":"sintoma|incidencia_dp|consulta|otro","gravedad":"baja|media|alta"}}',
-        "Incluye únicamente el bloque correspondiente al módulo elegido y omite los campos sin dato.",
-        "Los importes están en bolivianos (Bs) y las unidades son métricas.",
-      ].join("\n"),
-      contenido: data.texto,
-    });
+    const instrucciones = [
+      "Eres un asistente clínico que convierte notas dictadas por cuidadores en registros estructurados.",
+      "La paciente es una mujer mayor con enfermedad renal crónica en diálisis peritoneal (DPCA, 4 intercambios).",
+      `La fecha de hoy es ${hoy}.`,
+      "Devuelve SOLO un objeto JSON con esta forma:",
+      '{"modulo":"constantes|dialisis|medicacion|gasto|actividad|nota","resumen":"frase breve en español",',
+      '"constantes":{"presion_sistolica":num,"presion_diastolica":num,"frecuencia_cardiaca":num,"saturacion":num,',
+      '"temperatura":num,"peso":num,"glucemia":num,"ingesta_liquidos_ml":num,"diuresis_ml":num,"dolor":num,',
+      '"edema":"texto","apetito":"texto","descanso":"texto","sintomas":["texto"],"observaciones":"texto"},',
+      '"dialisis":{"fecha":"YYYY-MM-DD","concentracion":"texto","numero_bolsas":num,"volumen_infundido_ml":num,',
+      '"volumen_drenado_ml":num,"ultrafiltracion_ml":num,"aspecto_liquido":"claro|turbio|con fibrina",',
+      '"incidencias":"texto","observaciones":"texto"},',
+      '"gasto":{"fecha":"YYYY-MM-DD","categoria":"medicamentos|laboratorio|medicos|enfermeria|transporte|alimentacion|suministros|dialisis|tramites|otros","concepto":"texto","proveedor":"texto","importe":num},',
+      '"actividad":{"fecha":"YYYY-MM-DD","hora":"HH:MM","tipo":"consulta|analitica|entrega_suministros|tramite|visita_enfermeria|otro","titulo":"texto","lugar":"texto","notas":"texto"},',
+      '"nota":{"titulo":"texto","descripcion":"texto","categoria":"sintoma|incidencia_dp|consulta|otro","gravedad":"baja|media|alta"}}',
+      "Incluye únicamente el bloque correspondiente al módulo elegido y omite los campos sin dato.",
+      "Los importes están en bolivianos (Bs) y las unidades son métricas.",
+      "Responde exclusivamente con JSON válido, sin texto adicional.",
+    ].join("\n");
 
-    return extraerJson<RegistroInterpretado>(respuesta);
+    try {
+      const resultado = await ejecutarIA({
+        cliente: context.supabase,
+        userId: context.userId,
+        funcion: "voz",
+        pacienteId: null,
+        instrucciones,
+        entrada: data.texto,
+      });
+      return extraerJson<RegistroInterpretado>(resultado.texto);
+    } catch (error) {
+      if (error instanceof ErrorIA) throw new Error(error.message);
+      throw error;
+    }
   });
 
+// Documentos y OCR: API propia de OpenAI (nunca Lovable AI).
 export const leerDocumento = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((entrada: unknown) => EntradaDocumento.parse(entrada))
-  .handler(async ({ data }) => {
-    const { chatIA, extraerJson } = await import("./ia.server");
+  .handler(async ({ data, context }) => {
+    const { ejecutarIA, ErrorIA } = await import("./ia-openai.server");
+    const { extraerJson } = await import("./openai.server");
     const dataUrl = `data:${data.mimeType};base64,${data.archivoBase64}`;
 
-    const contenido = data.mimeType.startsWith("image/")
-      ? ([
-          { type: "text" as const, text: "Extrae la información de este documento clínico." },
-          { type: "image_url" as const, image_url: { url: dataUrl } },
-        ] as const)
-      : ([
-          { type: "text" as const, text: "Extrae la información de este documento clínico." },
-          { type: "file" as const, file: { filename: data.nombre, file_data: dataUrl } },
-        ] as const);
+    const bloques = data.mimeType.startsWith("image/")
+      ? [
+          { type: "input_text" as const, text: "Extrae la información de este documento clínico." },
+          { type: "input_image" as const, image_url: dataUrl },
+        ]
+      : [
+          { type: "input_text" as const, text: "Extrae la información de este documento clínico." },
+          { type: "input_file" as const, filename: data.nombre, file_data: dataUrl },
+        ];
 
-    const respuesta = await chatIA({
-      json: true,
-      system: [
-        "Eres un asistente que digitaliza documentos clínicos de una paciente en diálisis peritoneal.",
-        "Lee el documento y devuelve SOLO este objeto JSON:",
-        '{"titulo":"texto","tipo":"resultado_laboratorio|receta|informe|epicrisis|imagen|administrativo",',
-        '"fecha":"YYYY-MM-DD","institucion":"texto","resumen":"resumen clínico en 2 o 3 frases",',
-        '"texto_ocr":"transcripción completa del documento",',
-        '"resultados":[{"area":"renal|electrolitos|hematologia|metabolismo_mineral|pth|nutricion|hepatica|inflamacion|coagulacion|otros",',
-        '"parametro":"texto","valor":num,"unidad":"texto","rango_min":num,"rango_max":num}]}',
-        "Si no es una analítica, devuelve resultados como lista vacía. Responde en español.",
-      ].join("\n"),
-      contenido: [...contenido],
-    });
+    const instrucciones = [
+      "Eres un asistente que digitaliza documentos clínicos de una paciente en diálisis peritoneal.",
+      "Lee el documento y devuelve SOLO este objeto JSON:",
+      '{"titulo":"texto","tipo":"resultado_laboratorio|receta|informe|epicrisis|imagen|administrativo",',
+      '"fecha":"YYYY-MM-DD","institucion":"texto","resumen":"resumen clínico en 2 o 3 frases",',
+      '"texto_ocr":"transcripción completa del documento",',
+      '"resultados":[{"area":"renal|electrolitos|hematologia|metabolismo_mineral|pth|nutricion|hepatica|inflamacion|coagulacion|otros",',
+      '"parametro":"texto","valor":num,"unidad":"texto","rango_min":num,"rango_max":num}]}',
+      "Si no es una analítica, devuelve resultados como lista vacía. Responde en español y solo con JSON válido.",
+    ].join("\n");
 
-    return extraerJson<{
-      titulo: string;
-      tipo: string;
-      fecha: string;
-      institucion?: string;
-      resumen?: string;
-      texto_ocr?: string;
-      resultados?: {
-        area: string;
-        parametro: string;
-        valor: number | null;
-        unidad?: string;
-        rango_min?: number | null;
-        rango_max?: number | null;
-      }[];
-    }>(respuesta);
+    try {
+      const resultado = await ejecutarIA({
+        cliente: context.supabase,
+        userId: context.userId,
+        funcion: "ocr",
+        pacienteId: null,
+        instrucciones,
+        entrada: "Documento adjunto",
+        bloques,
+        maxTokens: 2000,
+      });
+
+      return extraerJson<{
+        titulo: string;
+        tipo: string;
+        fecha: string;
+        institucion?: string;
+        resumen?: string;
+        texto_ocr?: string;
+        resultados?: {
+          area: string;
+          parametro: string;
+          valor: number | null;
+          unidad?: string;
+          rango_min?: number | null;
+          rango_max?: number | null;
+        }[];
+      }>(resultado.texto);
+    } catch (error) {
+      if (error instanceof ErrorIA) throw new Error(error.message);
+      throw error;
+    }
   });
+
 
 // Informes: usa la API propia de OpenAI (producción) a través de la capa segura.
 export const generarInforme = createServerFn({ method: "POST" })

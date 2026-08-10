@@ -127,7 +127,11 @@ function Paciente() {
       if (campo === "peso_seco") cambios[campo] = valor === "" ? null : Number(valor);
       else cambios[campo] = valor === "" ? null : valor;
     }
-    const { error } = await supabase.from("pacientes").update(cambios).eq("id", PACIENTE_ID);
+    const { error } = await supabase
+      .from("pacientes")
+      .update(cambios as never)
+      .eq("id", PACIENTE_ID);
+
     setGuardando(false);
     setConfirmar(false);
     if (error) {

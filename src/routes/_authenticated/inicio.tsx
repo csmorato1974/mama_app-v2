@@ -140,7 +140,7 @@ function Inicio() {
                 <span className="truncate">Alertas activas</span>
               </CardTitle>
               <Link
-                to="/alertas"
+                to="/monitorizacion"
                 className="shrink-0 text-xs font-medium text-primary hover:underline"
               >
                 Ver todas

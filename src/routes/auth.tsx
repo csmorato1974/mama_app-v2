@@ -3,13 +3,24 @@ import { HeartPulse, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { CampoClave } from "@/components/CampoClave";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSesion } from "@/hooks/useSesion";
 import { supabase } from "@/integrations/supabase/client";
+import { MENSAJE_RECUPERACION } from "@/lib/permisos";
+
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -37,6 +48,22 @@ function Auth() {
   const [correo, setCorreo] = useState("");
   const [clave, setClave] = useState("");
   const [nombre, setNombre] = useState("");
+  const [recuperacionAbierta, setRecuperacionAbierta] = useState(false);
+  const [correoRecuperacion, setCorreoRecuperacion] = useState("");
+  const [enviandoRecuperacion, setEnviandoRecuperacion] = useState(false);
+
+  async function recuperar() {
+    setEnviandoRecuperacion(true);
+    await supabase.auth.resetPasswordForEmail(correoRecuperacion.trim(), {
+      redirectTo: `${window.location.origin}/restablecer`,
+    });
+    setEnviandoRecuperacion(false);
+    setRecuperacionAbierta(false);
+    setCorreoRecuperacion("");
+    // Mensaje genérico: no revelamos si el correo existe.
+    toast.success(MENSAJE_RECUPERACION);
+  }
+
 
   useEffect(() => {
     if (session) navigate({ to: "/inicio", replace: true });
@@ -128,19 +155,21 @@ function Auth() {
                     onChange={(e) => setCorreo(e.target.value)}
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="clave">Contraseña</Label>
-                  <Input
-                    id="clave"
-                    type="password"
-                    autoComplete="current-password"
-                    value={clave}
-                    onChange={(e) => setClave(e.target.value)}
-                  />
-                </div>
+                <CampoClave id="clave" valor={clave} onCambio={setClave} />
                 <Button className="w-full" onClick={entrar} disabled={cargando || !correo || !clave}>
                   {cargando ? <Loader2 className="size-4 animate-spin" /> : "Entrar"}
                 </Button>
+                <button
+                  type="button"
+                  className="w-full text-center text-xs font-medium text-primary underline-offset-4 hover:underline"
+                  onClick={() => {
+                    setCorreoRecuperacion(correo);
+                    setRecuperacionAbierta(true);
+                  }}
+                >
+                  ¿Olvidaste tu contraseña?
+                </button>
+
               </TabsContent>
 
               <TabsContent value="crear" className="space-y-3 pt-4">
@@ -158,16 +187,13 @@ function Auth() {
                     onChange={(e) => setCorreo(e.target.value)}
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="clave2">Contraseña</Label>
-                  <Input
-                    id="clave2"
-                    type="password"
-                    autoComplete="new-password"
-                    value={clave}
-                    onChange={(e) => setClave(e.target.value)}
-                  />
-                </div>
+                <CampoClave
+                  id="clave2"
+                  valor={clave}
+                  onCambio={setClave}
+                  autoComplete="new-password"
+                  ayuda="Mínimo 8 caracteres."
+                />
                 <Button
                   className="w-full"
                   onClick={registrar}
@@ -176,9 +202,10 @@ function Auth() {
                   {cargando ? <Loader2 className="size-4 animate-spin" /> : "Crear cuenta"}
                 </Button>
                 <p className="text-xs text-muted-foreground">
-                  La primera cuenta creada recibe el rol de administración; el resto entra como
-                  familiar y puede ajustarse después.
+                  La primera cuenta creada recibe el rol de administración. El resto queda pendiente de
+                  aprobación por administración antes de ver los datos del cuidado.
                 </p>
+
               </TabsContent>
             </Tabs>
 
@@ -192,7 +219,45 @@ function Auth() {
             </Button>
           </CardContent>
         </Card>
+
+        <Dialog open={recuperacionAbierta} onOpenChange={setRecuperacionAbierta}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle>Recuperar contraseña</DialogTitle>
+              <DialogDescription>
+                Indica el correo vinculado a tu cuenta. Te enviaremos un enlace de un solo uso y con
+                caducidad para establecer una contraseña nueva.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-1.5">
+              <Label htmlFor="correo-recuperacion">Correo</Label>
+              <Input
+                id="correo-recuperacion"
+                type="email"
+                autoComplete="email"
+                value={correoRecuperacion}
+                onChange={(e) => setCorreoRecuperacion(e.target.value)}
+              />
+            </div>
+            <DialogFooter className="gap-2 sm:gap-2">
+              <Button variant="outline" onClick={() => setRecuperacionAbierta(false)}>
+                Cancelar
+              </Button>
+              <Button
+                onClick={recuperar}
+                disabled={enviandoRecuperacion || !correoRecuperacion.includes("@")}
+              >
+                {enviandoRecuperacion ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  "Enviar enlace"
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
+
     </div>
   );
 }

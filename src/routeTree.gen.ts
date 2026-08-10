@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as RestablecerRouteImport } from './routes/restablecer'
 import { Route as AuthenticatedAgendaRouteImport } from './routes/_authenticated/agenda'
 import { Route as AuthenticatedAsistenteRouteImport } from './routes/_authenticated/asistente'
 import { Route as AuthenticatedCuidadorRouteImport } from './routes/_authenticated/cuidador'
@@ -28,7 +29,10 @@ import { Route as AuthenticatedMasRouteImport } from './routes/_authenticated/ma
 import { Route as AuthenticatedMedicacionRouteImport } from './routes/_authenticated/medicacion'
 import { Route as AuthenticatedMonitorizacionRouteImport } from './routes/_authenticated/monitorizacion'
 import { Route as AuthenticatedNutricionRouteImport } from './routes/_authenticated/nutricion'
+import { Route as AuthenticatedPacienteRouteImport } from './routes/_authenticated/paciente'
+import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AuthenticatedSaludRouteImport } from './routes/_authenticated/salud'
+import { Route as AuthenticatedUsuariosRouteImport } from './routes/_authenticated/usuarios'
 import { Route as AuthenticatedWearableRouteImport } from './routes/_authenticated/wearable'
 
 const IndexRoute = IndexRouteImport.update({
@@ -43,6 +47,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RestablecerRoute = RestablecerRouteImport.update({
+  id: '/restablecer',
+  path: '/restablecer',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAgendaRoute = AuthenticatedAgendaRouteImport.update({
@@ -126,9 +135,24 @@ const AuthenticatedNutricionRoute = AuthenticatedNutricionRouteImport.update({
   path: '/nutricion',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPacienteRoute = AuthenticatedPacienteRouteImport.update({
+  id: '/paciente',
+  path: '/paciente',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSaludRoute = AuthenticatedSaludRouteImport.update({
   id: '/salud',
   path: '/salud',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedUsuariosRoute = AuthenticatedUsuariosRouteImport.update({
+  id: '/usuarios',
+  path: '/usuarios',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedWearableRoute = AuthenticatedWearableRouteImport.update({
@@ -140,6 +164,7 @@ const AuthenticatedWearableRoute = AuthenticatedWearableRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/restablecer': typeof RestablecerRoute
   '/agenda': typeof AuthenticatedAgendaRoute
   '/asistente': typeof AuthenticatedAsistenteRoute
   '/cuidador': typeof AuthenticatedCuidadorRoute
@@ -156,12 +181,16 @@ export interface FileRoutesByFullPath {
   '/medicacion': typeof AuthenticatedMedicacionRoute
   '/monitorizacion': typeof AuthenticatedMonitorizacionRoute
   '/nutricion': typeof AuthenticatedNutricionRoute
+  '/paciente': typeof AuthenticatedPacienteRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
   '/salud': typeof AuthenticatedSaludRoute
+  '/usuarios': typeof AuthenticatedUsuariosRoute
   '/wearable': typeof AuthenticatedWearableRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/restablecer': typeof RestablecerRoute
   '/agenda': typeof AuthenticatedAgendaRoute
   '/asistente': typeof AuthenticatedAsistenteRoute
   '/cuidador': typeof AuthenticatedCuidadorRoute
@@ -178,7 +207,10 @@ export interface FileRoutesByTo {
   '/medicacion': typeof AuthenticatedMedicacionRoute
   '/monitorizacion': typeof AuthenticatedMonitorizacionRoute
   '/nutricion': typeof AuthenticatedNutricionRoute
+  '/paciente': typeof AuthenticatedPacienteRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
   '/salud': typeof AuthenticatedSaludRoute
+  '/usuarios': typeof AuthenticatedUsuariosRoute
   '/wearable': typeof AuthenticatedWearableRoute
 }
 export interface FileRoutesById {
@@ -186,6 +218,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/restablecer': typeof RestablecerRoute
   '/_authenticated/agenda': typeof AuthenticatedAgendaRoute
   '/_authenticated/asistente': typeof AuthenticatedAsistenteRoute
   '/_authenticated/cuidador': typeof AuthenticatedCuidadorRoute
@@ -202,7 +235,10 @@ export interface FileRoutesById {
   '/_authenticated/medicacion': typeof AuthenticatedMedicacionRoute
   '/_authenticated/monitorizacion': typeof AuthenticatedMonitorizacionRoute
   '/_authenticated/nutricion': typeof AuthenticatedNutricionRoute
+  '/_authenticated/paciente': typeof AuthenticatedPacienteRoute
+  '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/_authenticated/salud': typeof AuthenticatedSaludRoute
+  '/_authenticated/usuarios': typeof AuthenticatedUsuariosRoute
   '/_authenticated/wearable': typeof AuthenticatedWearableRoute
 }
 export interface FileRouteTypes {
@@ -210,6 +246,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/restablecer'
     | '/agenda'
     | '/asistente'
     | '/cuidador'
@@ -226,12 +263,16 @@ export interface FileRouteTypes {
     | '/medicacion'
     | '/monitorizacion'
     | '/nutricion'
+    | '/paciente'
+    | '/perfil'
     | '/salud'
+    | '/usuarios'
     | '/wearable'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/restablecer'
     | '/agenda'
     | '/asistente'
     | '/cuidador'
@@ -248,13 +289,17 @@ export interface FileRouteTypes {
     | '/medicacion'
     | '/monitorizacion'
     | '/nutricion'
+    | '/paciente'
+    | '/perfil'
     | '/salud'
+    | '/usuarios'
     | '/wearable'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/restablecer'
     | '/_authenticated/agenda'
     | '/_authenticated/asistente'
     | '/_authenticated/cuidador'
@@ -271,7 +316,10 @@ export interface FileRouteTypes {
     | '/_authenticated/medicacion'
     | '/_authenticated/monitorizacion'
     | '/_authenticated/nutricion'
+    | '/_authenticated/paciente'
+    | '/_authenticated/perfil'
     | '/_authenticated/salud'
+    | '/_authenticated/usuarios'
     | '/_authenticated/wearable'
   fileRoutesById: FileRoutesById
 }
@@ -279,6 +327,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  RestablecerRoute: typeof RestablecerRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -302,6 +351,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/restablecer': {
+      id: '/restablecer'
+      path: '/restablecer'
+      fullPath: '/restablecer'
+      preLoaderRoute: typeof RestablecerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/agenda': {
@@ -416,11 +472,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedNutricionRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/paciente': {
+      id: '/_authenticated/paciente'
+      path: '/paciente'
+      fullPath: '/paciente'
+      preLoaderRoute: typeof AuthenticatedPacienteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/perfil': {
+      id: '/_authenticated/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof AuthenticatedPerfilRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/salud': {
       id: '/_authenticated/salud'
       path: '/salud'
       fullPath: '/salud'
       preLoaderRoute: typeof AuthenticatedSaludRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/usuarios': {
+      id: '/_authenticated/usuarios'
+      path: '/usuarios'
+      fullPath: '/usuarios'
+      preLoaderRoute: typeof AuthenticatedUsuariosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/wearable': {
@@ -450,7 +527,10 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMedicacionRoute: typeof AuthenticatedMedicacionRoute
   AuthenticatedMonitorizacionRoute: typeof AuthenticatedMonitorizacionRoute
   AuthenticatedNutricionRoute: typeof AuthenticatedNutricionRoute
+  AuthenticatedPacienteRoute: typeof AuthenticatedPacienteRoute
+  AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
   AuthenticatedSaludRoute: typeof AuthenticatedSaludRoute
+  AuthenticatedUsuariosRoute: typeof AuthenticatedUsuariosRoute
   AuthenticatedWearableRoute: typeof AuthenticatedWearableRoute
 }
 
@@ -471,7 +551,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMedicacionRoute: AuthenticatedMedicacionRoute,
   AuthenticatedMonitorizacionRoute: AuthenticatedMonitorizacionRoute,
   AuthenticatedNutricionRoute: AuthenticatedNutricionRoute,
+  AuthenticatedPacienteRoute: AuthenticatedPacienteRoute,
+  AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
   AuthenticatedSaludRoute: AuthenticatedSaludRoute,
+  AuthenticatedUsuariosRoute: AuthenticatedUsuariosRoute,
   AuthenticatedWearableRoute: AuthenticatedWearableRoute,
 }
 
@@ -482,6 +565,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  RestablecerRoute: RestablecerRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

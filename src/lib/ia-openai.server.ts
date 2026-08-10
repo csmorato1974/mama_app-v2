@@ -11,6 +11,9 @@ import {
   evaluarLimites,
   llamarOpenAI,
   modeloConfigurado,
+  MODELO_TRANSCRIPCION,
+  transcribirOpenAI,
+  type BloqueEntrada,
   type ConfigIA,
   type FuncionIA,
 } from "./openai.server";
@@ -187,6 +190,7 @@ export async function ejecutarIA(opciones: {
   pacienteId: string | null;
   instrucciones: string;
   entrada: string;
+  bloques?: BloqueEntrada[];
   maxTokens?: number;
 }): Promise<{ texto: string; modelo: string; tokens: number; requestId: string | null }> {
   if (!claveConfigurada()) {
@@ -209,6 +213,7 @@ export async function ejecutarIA(opciones: {
       modelo: config.modelo,
       instrucciones: opciones.instrucciones,
       entrada: opciones.entrada,
+      ...(opciones.bloques === undefined ? {} : { bloques: opciones.bloques }),
       ...(opciones.maxTokens === undefined ? {} : { maxTokens: opciones.maxTokens }),
     });
 
@@ -245,5 +250,61 @@ export async function ejecutarIA(opciones: {
       error_codigo: codigo,
     });
     throw new ErrorIA("El servicio de IA no pudo responder. Inténtalo de nuevo en unos minutos.");
+  }
+}
+
+/** Verificación de rol y límites compartida por voz/OCR/chat. */
+async function autorizarIA(cliente: Cliente, userId: string) {
+  if (!claveConfigurada()) {
+    throw new ErrorIA(
+      "Configuración pendiente: falta el secreto OPENAI_API_KEY. Un administrador debe añadirlo para activar la IA.",
+    );
+  }
+  const roles = await rolesDeUsuario(cliente, userId);
+  if (!roles.some((r) => ROLES_IA.includes(r))) throw new ErrorIA("Tu rol no tiene permiso para usar la IA.");
+  const config = await leerConfig();
+  const limite = evaluarLimites(config, await consumo(userId));
+  if (!limite.permitido) throw new ErrorIA(limite.motivo);
+  return config;
+}
+
+/** Voz: transcripción con la API propia de OpenAI, con límites y registro de consumo. */
+export async function ejecutarVoz(opciones: {
+  cliente: Cliente;
+  userId: string;
+  audioBase64: string;
+  mimeType: string;
+}): Promise<{ texto: string }> {
+  await autorizarIA(opciones.cliente, opciones.userId);
+
+  try {
+    const resultado = await transcribirOpenAI(opciones.audioBase64, opciones.mimeType);
+    await registrar({
+      usuario_id: opciones.userId,
+      paciente_id: null,
+      funcion: "voz",
+      modelo: MODELO_TRANSCRIPCION,
+      tokens_entrada: 0,
+      tokens_salida: 0,
+      latencia_ms: resultado.latenciaMs,
+      estado: "ok",
+      request_id: resultado.requestId,
+    });
+    return { texto: resultado.texto };
+  } catch (error) {
+    const codigo = errorSeguro(error);
+    console.error(`[IA] voz falló: ${codigo}`);
+    await registrar({
+      usuario_id: opciones.userId,
+      paciente_id: null,
+      funcion: "voz",
+      modelo: MODELO_TRANSCRIPCION,
+      tokens_entrada: 0,
+      tokens_salida: 0,
+      latencia_ms: 0,
+      estado: "error",
+      error_codigo: codigo,
+    });
+    throw new ErrorIA("No se pudo transcribir el audio. Inténtalo de nuevo.");
   }
 }

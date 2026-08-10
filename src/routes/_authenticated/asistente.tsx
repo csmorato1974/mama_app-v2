@@ -34,7 +34,7 @@ export const Route = createFileRoute("/_authenticated/asistente")({
       { property: "og:description", content: "Preguntas en lenguaje natural sobre el cuidado de la paciente." },
     ],
   }),
-  component: Asistente;
+  component: Asistente,
 });
 
 const SUGERENCIAS = [

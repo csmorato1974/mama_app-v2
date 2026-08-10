@@ -166,16 +166,11 @@ export function AppShell({
             </div>
             <div className="flex shrink-0 items-center gap-2">
               {acciones}
-              <Link to="/alertas" className="relative">
-                <Button variant="outline" size="sm" className="gap-2">
-                  Alertas
-                  {altas > 0 ? (
-                    <Badge variant="destructive" className="px-1.5 py-0 text-[0.65rem]">
-                      {altas}
-                    </Badge>
-                  ) : null}
-                </Button>
-              </Link>
+              {altas > 0 ? (
+                <Badge variant="destructive" className="shrink-0 gap-1 px-2 py-1 text-[0.7rem]">
+                  {altas} alertas
+                </Badge>
+              ) : null}
             </div>
           </div>
         </header>
@@ -183,7 +178,7 @@ export function AppShell({
         <main className="flex-1 px-4 pb-28 pt-4 lg:px-8 lg:pb-12">{children}</main>
 
         <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden">
-          <div className="grid grid-cols-5 items-end">
+          <div className="grid grid-cols-4 items-end">
             {NAV_MOVIL.slice(0, 2).map((ruta) => {
               const item = NAV.find((n) => n.to === ruta)!;
               const activo = location.pathname === item.to;

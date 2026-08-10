@@ -4,8 +4,9 @@ const config: CapacitorConfig = {
   appId: "com.mamita.cuidados",
   appName: "Centro de Cuidados",
   webDir: ".output/public",
-  androidScheme: "https",
-  bundledWebRuntime: false,
+  server: {
+    androidScheme: "https",
+  },
 };
 
 export default config;

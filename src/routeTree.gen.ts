@@ -17,6 +17,7 @@ import { Route as AuthenticatedDialisisRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedDirectorioRouteImport } from './routes/_authenticated/directorio'
 import { Route as AuthenticatedHistorialRouteImport } from './routes/_authenticated/historial'
 import { Route as AuthenticatedInicioRouteImport } from './routes/_authenticated/inicio'
+import { Route as AuthenticatedInventarioRouteImport } from './routes/_authenticated/inventario'
 import { Route as AuthenticatedMasRouteImport } from './routes/_authenticated/mas'
 import { Route as AuthenticatedMedicacionRouteImport } from './routes/_authenticated/medicacion'
 import { Route as AuthenticatedMonitorizacionRouteImport } from './routes/_authenticated/monitorizacion'
@@ -63,6 +64,11 @@ const AuthenticatedInicioRoute = AuthenticatedInicioRouteImport.update({
   path: '/inicio',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedInventarioRoute = AuthenticatedInventarioRouteImport.update({
+  id: '/inventario',
+  path: '/inventario',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMasRoute = AuthenticatedMasRouteImport.update({
   id: '/mas',
   path: '/mas',
@@ -103,6 +109,7 @@ export interface FileRoutesByFullPath {
   '/directorio': typeof AuthenticatedDirectorioRoute
   '/historial': typeof AuthenticatedHistorialRoute
   '/inicio': typeof AuthenticatedInicioRoute
+  '/inventario': typeof AuthenticatedInventarioRoute
   '/mas': typeof AuthenticatedMasRoute
   '/medicacion': typeof AuthenticatedMedicacionRoute
   '/monitorizacion': typeof AuthenticatedMonitorizacionRoute
@@ -118,6 +125,7 @@ export interface FileRoutesByTo {
   '/directorio': typeof AuthenticatedDirectorioRoute
   '/historial': typeof AuthenticatedHistorialRoute
   '/inicio': typeof AuthenticatedInicioRoute
+  '/inventario': typeof AuthenticatedInventarioRoute
   '/mas': typeof AuthenticatedMasRoute
   '/medicacion': typeof AuthenticatedMedicacionRoute
   '/monitorizacion': typeof AuthenticatedMonitorizacionRoute
@@ -135,6 +143,7 @@ export interface FileRoutesById {
   '/_authenticated/directorio': typeof AuthenticatedDirectorioRoute
   '/_authenticated/historial': typeof AuthenticatedHistorialRoute
   '/_authenticated/inicio': typeof AuthenticatedInicioRoute
+  '/_authenticated/inventario': typeof AuthenticatedInventarioRoute
   '/_authenticated/mas': typeof AuthenticatedMasRoute
   '/_authenticated/medicacion': typeof AuthenticatedMedicacionRoute
   '/_authenticated/monitorizacion': typeof AuthenticatedMonitorizacionRoute
@@ -152,6 +161,7 @@ export interface FileRouteTypes {
     | '/directorio'
     | '/historial'
     | '/inicio'
+    | '/inventario'
     | '/mas'
     | '/medicacion'
     | '/monitorizacion'
@@ -167,6 +177,7 @@ export interface FileRouteTypes {
     | '/directorio'
     | '/historial'
     | '/inicio'
+    | '/inventario'
     | '/mas'
     | '/medicacion'
     | '/monitorizacion'
@@ -183,6 +194,7 @@ export interface FileRouteTypes {
     | '/_authenticated/directorio'
     | '/_authenticated/historial'
     | '/_authenticated/inicio'
+    | '/_authenticated/inventario'
     | '/_authenticated/mas'
     | '/_authenticated/medicacion'
     | '/_authenticated/monitorizacion'
@@ -255,6 +267,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInicioRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/inventario': {
+      id: '/_authenticated/inventario'
+      path: '/inventario'
+      fullPath: '/inventario'
+      preLoaderRoute: typeof AuthenticatedInventarioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/mas': {
       id: '/_authenticated/mas'
       path: '/mas'
@@ -306,6 +325,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDirectorioRoute: typeof AuthenticatedDirectorioRoute
   AuthenticatedHistorialRoute: typeof AuthenticatedHistorialRoute
   AuthenticatedInicioRoute: typeof AuthenticatedInicioRoute
+  AuthenticatedInventarioRoute: typeof AuthenticatedInventarioRoute
   AuthenticatedMasRoute: typeof AuthenticatedMasRoute
   AuthenticatedMedicacionRoute: typeof AuthenticatedMedicacionRoute
   AuthenticatedMonitorizacionRoute: typeof AuthenticatedMonitorizacionRoute
@@ -320,6 +340,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDirectorioRoute: AuthenticatedDirectorioRoute,
   AuthenticatedHistorialRoute: AuthenticatedHistorialRoute,
   AuthenticatedInicioRoute: AuthenticatedInicioRoute,
+  AuthenticatedInventarioRoute: AuthenticatedInventarioRoute,
   AuthenticatedMasRoute: AuthenticatedMasRoute,
   AuthenticatedMedicacionRoute: AuthenticatedMedicacionRoute,
   AuthenticatedMonitorizacionRoute: AuthenticatedMonitorizacionRoute,
@@ -339,3 +360,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

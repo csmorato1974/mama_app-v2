@@ -145,6 +145,25 @@ function Asistente() {
                     onGuardar={(valores) => guardar.mutate({ data: valores })}
                   />
 
+                  <div className="space-y-2 rounded-md border border-border p-3 text-xs">
+                    <p className="font-medium text-foreground">Proveedor de IA por función</p>
+                    {(estado.data?.proveedores ?? []).map((p) => (
+                      <div key={p.funcion} className="flex flex-wrap items-center justify-between gap-2">
+                        <span className="text-muted-foreground">{p.etiqueta}</span>
+                        <span className="flex items-center gap-2">
+                          <Badge variant={p.proveedor.startsWith("OpenAI") ? "secondary" : "destructive"}>
+                            {p.proveedor}
+                          </Badge>
+                          <span className="text-muted-foreground">{p.modelo}</span>
+                        </span>
+                      </div>
+                    ))}
+                    <p className="text-muted-foreground">
+                      Ninguna función usa IA de Lovable: si falta OPENAI_API_KEY se muestra configuración pendiente y no
+                      hay proveedor alternativo.
+                    </p>
+                  </div>
+
                   <div className="space-y-1 rounded-md bg-muted/50 p-3 text-xs text-muted-foreground">
                     <p className="font-medium text-foreground">Documentación para administradores</p>
                     <p>
@@ -160,8 +179,12 @@ function Asistente() {
                       4. Todo consumo queda registrado (usuario, paciente, modelo, tokens, coste, latencia, estado) sin
                       guardar contenido clínico ni claves.
                     </p>
-                    <p>5. OCR y voz usan la misma capa de servidor y quedan desacoplados hasta su activación.</p>
+                    <p>
+                      5. Chatbot, informes, OCR y voz comparten esta misma capa de servidor con OpenAI; los registros
+                      históricos del panel de Lovable se conservan, solo se evitan nuevas llamadas.
+                    </p>
                   </div>
+
                 </div>
               ) : null}
             </CardContent>

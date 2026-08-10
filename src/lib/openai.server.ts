@@ -5,6 +5,7 @@
 
 const OPENAI_URL = "https://api.openai.com/v1/responses";
 export const MODELO_POR_DEFECTO = "gpt-4o-mini";
+export const MODELO_TRANSCRIPCION = "gpt-4o-mini-transcribe";
 
 // USD por 1M de tokens (aproximado, solo para estimar consumo).
 const PRECIOS: Record<string, { entrada: number; salida: number }> = {
@@ -90,12 +91,19 @@ export type RespuestaOpenAI = {
   latenciaMs: number;
 };
 
+export type BloqueEntrada =
+  | { type: "input_text"; text: string }
+  | { type: "input_image"; image_url: string }
+  | { type: "input_file"; filename: string; file_data: string };
+
 export async function llamarOpenAI(opciones: {
   modelo: string;
   instrucciones: string;
   entrada: string;
+  bloques?: BloqueEntrada[];
   maxTokens?: number;
 }): Promise<RespuestaOpenAI> {
+
   const clave = process.env["OPENAI_API_KEY"];
   if (!clave) throw new Error("configuracion_pendiente");
 
@@ -109,7 +117,10 @@ export async function llamarOpenAI(opciones: {
     body: JSON.stringify({
       model: opciones.modelo,
       instructions: opciones.instrucciones,
-      input: opciones.entrada,
+      input: opciones.bloques
+        ? [{ role: "user", content: opciones.bloques }]
+        : opciones.entrada,
+
       max_output_tokens: opciones.maxTokens ?? 1200,
       store: false,
     }),
@@ -142,6 +153,68 @@ export async function llamarOpenAI(opciones: {
     tokensEntrada: datos.usage?.input_tokens ?? 0,
     tokensSalida: datos.usage?.output_tokens ?? 0,
     requestId,
+    latenciaMs: Date.now() - inicio,
+  };
+}
+
+// Proveedor declarado por función de IA. La app publicada usa EXCLUSIVAMENTE
+// nuestra capa propia de OpenAI: no existe fallback a Lovable AI.
+export const PROVEEDORES: { funcion: FuncionIA; etiqueta: string; proveedor: string; modelo: string }[] = [
+  { funcion: "assistant-chat", etiqueta: "Chatbot clínico", proveedor: "OpenAI (API propia)", modelo: "OPENAI_MODEL" },
+  { funcion: "informe", etiqueta: "Informes y resúmenes", proveedor: "OpenAI (API propia)", modelo: "OPENAI_MODEL" },
+  { funcion: "ocr", etiqueta: "Documentos y OCR", proveedor: "OpenAI (API propia)", modelo: "OPENAI_MODEL" },
+  { funcion: "voz", etiqueta: "Voz y dictado", proveedor: "OpenAI (API propia)", modelo: MODELO_TRANSCRIPCION },
+];
+
+export function extraerJson<T>(texto: string): T {
+  const limpio = texto
+    .trim()
+    .replace(/^```(?:json)?/i, "")
+    .replace(/```$/, "")
+    .trim();
+  const inicio = limpio.indexOf("{");
+  const fin = limpio.lastIndexOf("}");
+  const candidato = inicio >= 0 && fin > inicio ? limpio.slice(inicio, fin + 1) : limpio;
+  return JSON.parse(candidato) as T;
+}
+
+/** Transcripción de voz con la API propia de OpenAI (nunca Lovable). */
+export async function transcribirOpenAI(
+  base64: string,
+  mime: string,
+): Promise<{ texto: string; requestId: string | null; latenciaMs: number }> {
+  const clave = process.env["OPENAI_API_KEY"];
+  if (!clave) throw new Error("configuracion_pendiente");
+
+  const binario = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+  const extension = mime.includes("wav")
+    ? "wav"
+    : mime.includes("mp4")
+      ? "mp4"
+      : mime.includes("mpeg")
+        ? "mp3"
+        : "webm";
+
+  const formulario = new FormData();
+  formulario.append("model", MODELO_TRANSCRIPCION);
+  formulario.append("file", new Blob([binario], { type: mime }), `nota.${extension}`);
+
+  const inicio = Date.now();
+  const respuesta = await fetch("https://api.openai.com/v1/audio/transcriptions", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${clave}` },
+    body: formulario,
+  });
+
+  if (!respuesta.ok) {
+    const detalle = await respuesta.text().catch(() => "");
+    throw new Error(`openai_${respuesta.status}: ${detalle.slice(0, 120)}`);
+  }
+
+  const datos = (await respuesta.json()) as { text?: string };
+  return {
+    texto: datos.text ?? "",
+    requestId: respuesta.headers.get("x-request-id"),
     latenciaMs: Date.now() - inicio,
   };
 }

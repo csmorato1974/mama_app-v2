@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { supabase } from "@/integrations/supabase/client";
+import { registrarAuditoria } from "@/lib/auditoria";
 import type { Rol } from "@/hooks/useSesion";
 
 export type Usuario = {
@@ -51,6 +52,12 @@ export function useGuardarPerfil() {
     }) => {
       const { error } = await supabase.from("profiles").update(cambios).eq("id", id);
       if (error) throw error;
+      void registrarAuditoria({
+        tabla: "profiles",
+        accion: "actualizar",
+        registroId: id,
+        campos: Object.keys(cambios),
+      });
     },
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["usuarios"] });
@@ -67,6 +74,12 @@ export function useAsignarRol() {
       if (errorBorrado) throw errorBorrado;
       const { error } = await supabase.from("user_roles").insert({ user_id: userId, role: rol });
       if (error) throw error;
+      void registrarAuditoria({
+        tabla: "user_roles",
+        accion: "actualizar",
+        registroId: userId,
+        campos: ["role"],
+      });
     },
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["usuarios"] });

@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+
 export type RegistroInterpretado = {
   modulo: "constantes" | "dialisis" | "medicacion" | "gasto" | "actividad" | "nota";
   resumen?: string;
@@ -74,6 +76,7 @@ const EntradaInforme = z.object({
 });
 
 export const transcribirNota = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((entrada: unknown) => EntradaVoz.parse(entrada))
   .handler(async ({ data }) => {
     const { transcribir } = await import("./ia.server");
@@ -82,6 +85,7 @@ export const transcribirNota = createServerFn({ method: "POST" })
   });
 
 export const interpretarRegistro = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((entrada: unknown) => EntradaTexto.parse(entrada))
   .handler(async ({ data }) => {
     const { chatIA, extraerJson } = await import("./ia.server");
@@ -114,6 +118,7 @@ export const interpretarRegistro = createServerFn({ method: "POST" })
   });
 
 export const leerDocumento = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((entrada: unknown) => EntradaDocumento.parse(entrada))
   .handler(async ({ data }) => {
     const { chatIA, extraerJson } = await import("./ia.server");
@@ -163,6 +168,7 @@ export const leerDocumento = createServerFn({ method: "POST" })
   });
 
 export const generarInforme = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((entrada: unknown) => EntradaInforme.parse(entrada))
   .handler(async ({ data }) => {
     const { chatIA } = await import("./ia.server");

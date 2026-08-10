@@ -3,13 +3,24 @@ import { HeartPulse, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { CampoClave } from "@/components/CampoClave";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSesion } from "@/hooks/useSesion";
 import { supabase } from "@/integrations/supabase/client";
+import { MENSAJE_RECUPERACION } from "@/lib/permisos";
+
 
 export const Route = createFileRoute("/auth")({
   ssr: false,

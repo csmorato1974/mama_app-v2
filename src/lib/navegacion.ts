@@ -7,16 +7,20 @@ import {
   FileText,
   HandHeart,
   HeartPulse,
+  IdCard,
   LayoutDashboard,
   LayoutGrid,
   MonitorSmartphone,
   Package,
   Pill,
   Receipt,
+  ShieldCheck,
   Stethoscope,
+  UserCircle,
   Users,
   Watch,
 } from "lucide-react";
+
 
 export type NavItem = {
   to: string;

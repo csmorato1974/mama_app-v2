@@ -30,6 +30,7 @@ import { Route as AuthenticatedMedicacionRouteImport } from './routes/_authentic
 import { Route as AuthenticatedMonitorizacionRouteImport } from './routes/_authenticated/monitorizacion'
 import { Route as AuthenticatedNutricionRouteImport } from './routes/_authenticated/nutricion'
 import { Route as AuthenticatedPacienteRouteImport } from './routes/_authenticated/paciente'
+import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AuthenticatedSaludRouteImport } from './routes/_authenticated/salud'
 import { Route as AuthenticatedWearableRouteImport } from './routes/_authenticated/wearable'
 
@@ -138,6 +139,11 @@ const AuthenticatedPacienteRoute = AuthenticatedPacienteRouteImport.update({
   path: '/paciente',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSaludRoute = AuthenticatedSaludRouteImport.update({
   id: '/salud',
   path: '/salud',
@@ -170,6 +176,7 @@ export interface FileRoutesByFullPath {
   '/monitorizacion': typeof AuthenticatedMonitorizacionRoute
   '/nutricion': typeof AuthenticatedNutricionRoute
   '/paciente': typeof AuthenticatedPacienteRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
   '/salud': typeof AuthenticatedSaludRoute
   '/wearable': typeof AuthenticatedWearableRoute
 }
@@ -194,6 +201,7 @@ export interface FileRoutesByTo {
   '/monitorizacion': typeof AuthenticatedMonitorizacionRoute
   '/nutricion': typeof AuthenticatedNutricionRoute
   '/paciente': typeof AuthenticatedPacienteRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
   '/salud': typeof AuthenticatedSaludRoute
   '/wearable': typeof AuthenticatedWearableRoute
 }
@@ -220,6 +228,7 @@ export interface FileRoutesById {
   '/_authenticated/monitorizacion': typeof AuthenticatedMonitorizacionRoute
   '/_authenticated/nutricion': typeof AuthenticatedNutricionRoute
   '/_authenticated/paciente': typeof AuthenticatedPacienteRoute
+  '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/_authenticated/salud': typeof AuthenticatedSaludRoute
   '/_authenticated/wearable': typeof AuthenticatedWearableRoute
 }
@@ -246,6 +255,7 @@ export interface FileRouteTypes {
     | '/monitorizacion'
     | '/nutricion'
     | '/paciente'
+    | '/perfil'
     | '/salud'
     | '/wearable'
   fileRoutesByTo: FileRoutesByTo
@@ -270,6 +280,7 @@ export interface FileRouteTypes {
     | '/monitorizacion'
     | '/nutricion'
     | '/paciente'
+    | '/perfil'
     | '/salud'
     | '/wearable'
   id:
@@ -295,6 +306,7 @@ export interface FileRouteTypes {
     | '/_authenticated/monitorizacion'
     | '/_authenticated/nutricion'
     | '/_authenticated/paciente'
+    | '/_authenticated/perfil'
     | '/_authenticated/salud'
     | '/_authenticated/wearable'
   fileRoutesById: FileRoutesById
@@ -455,6 +467,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPacienteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/perfil': {
+      id: '/_authenticated/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof AuthenticatedPerfilRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/salud': {
       id: '/_authenticated/salud'
       path: '/salud'
@@ -490,6 +509,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMonitorizacionRoute: typeof AuthenticatedMonitorizacionRoute
   AuthenticatedNutricionRoute: typeof AuthenticatedNutricionRoute
   AuthenticatedPacienteRoute: typeof AuthenticatedPacienteRoute
+  AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
   AuthenticatedSaludRoute: typeof AuthenticatedSaludRoute
   AuthenticatedWearableRoute: typeof AuthenticatedWearableRoute
 }
@@ -512,6 +532,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMonitorizacionRoute: AuthenticatedMonitorizacionRoute,
   AuthenticatedNutricionRoute: AuthenticatedNutricionRoute,
   AuthenticatedPacienteRoute: AuthenticatedPacienteRoute,
+  AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
   AuthenticatedSaludRoute: AuthenticatedSaludRoute,
   AuthenticatedWearableRoute: AuthenticatedWearableRoute,
 }

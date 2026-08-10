@@ -167,11 +167,12 @@ export const leerDocumento = createServerFn({ method: "POST" })
     }>(respuesta);
   });
 
+// Informes: usa la API propia de OpenAI (producción) a través de la capa segura.
 export const generarInforme = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((entrada: unknown) => EntradaInforme.parse(entrada))
-  .handler(async ({ data }) => {
-    const { chatIA } = await import("./ia.server");
+  .handler(async ({ data, context }) => {
+    const { ejecutarIA, ErrorIA } = await import("./ia-openai.server");
     const enfoque =
       data.tipo === "consulta"
         ? "Informe de preparación para la próxima consulta de nefrología."
@@ -179,18 +180,27 @@ export const generarInforme = createServerFn({ method: "POST" })
           ? "Resumen semanal del estado y del cuidado."
           : "Resumen mensual clínico y administrativo.";
 
-    const texto = await chatIA({
-      system: [
-        "Eres un asistente clínico que redacta informes claros para el equipo médico y la familia.",
-        "La paciente es una mujer mayor con enfermedad renal crónica estadio 5 en diálisis peritoneal continua ambulatoria.",
-        `Tarea: ${enfoque}`,
-        "Escribe en español, con encabezados en markdown y frases breves.",
-        "Estructura: Situación general, Constantes y tendencias, Diálisis peritoneal, Medicación, Analíticas relevantes, Aspectos logísticos y económicos, Puntos a consultar con el equipo médico.",
-        "No inventes datos: usa solo la información entregada e indica cuando falte información.",
-        "Los importes están en bolivianos (Bs).",
-      ].join("\n"),
-      contenido: data.contexto,
-    });
-
-    return { texto };
+    try {
+      const resultado = await ejecutarIA({
+        cliente: context.supabase,
+        userId: context.userId,
+        funcion: "informe",
+        pacienteId: null,
+        instrucciones: [
+          "Eres un asistente clínico que redacta informes claros para el equipo médico y la familia.",
+          "La paciente es una mujer mayor con enfermedad renal crónica estadio 5 en diálisis peritoneal continua ambulatoria.",
+          `Tarea: ${enfoque}`,
+          "Escribe en español, con encabezados en markdown y frases breves.",
+          "Estructura: Situación general, Constantes y tendencias, Diálisis peritoneal, Medicación, Analíticas relevantes, Aspectos logísticos y económicos, Puntos a consultar con el equipo médico.",
+          "No inventes datos: usa solo la información entregada e indica cuando falte información.",
+          "Los importes están en bolivianos (Bs).",
+        ].join("\n"),
+        entrada: data.contexto.slice(0, 9000),
+      });
+      return { texto: resultado.texto };
+    } catch (error) {
+      if (error instanceof ErrorIA) return { texto: error.message };
+      throw error;
+    }
   });
+

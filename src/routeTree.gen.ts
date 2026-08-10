@@ -13,8 +13,16 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAgendaRouteImport } from './routes/_authenticated/agenda'
+import { Route as AuthenticatedDialisisRouteImport } from './routes/_authenticated/dialisis'
+import { Route as AuthenticatedDirectorioRouteImport } from './routes/_authenticated/directorio'
+import { Route as AuthenticatedHistorialRouteImport } from './routes/_authenticated/historial'
 import { Route as AuthenticatedInicioRouteImport } from './routes/_authenticated/inicio'
+import { Route as AuthenticatedMasRouteImport } from './routes/_authenticated/mas'
+import { Route as AuthenticatedMedicacionRouteImport } from './routes/_authenticated/medicacion'
+import { Route as AuthenticatedMonitorizacionRouteImport } from './routes/_authenticated/monitorizacion'
+import { Route as AuthenticatedNutricionRouteImport } from './routes/_authenticated/nutricion'
 import { Route as AuthenticatedSaludRouteImport } from './routes/_authenticated/salud'
+import { Route as AuthenticatedWearableRouteImport } from './routes/_authenticated/wearable'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -35,9 +43,45 @@ const AuthenticatedAgendaRoute = AuthenticatedAgendaRouteImport.update({
   path: '/agenda',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDialisisRoute = AuthenticatedDialisisRouteImport.update({
+  id: '/dialisis',
+  path: '/dialisis',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDirectorioRoute = AuthenticatedDirectorioRouteImport.update({
+  id: '/directorio',
+  path: '/directorio',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedHistorialRoute = AuthenticatedHistorialRouteImport.update({
+  id: '/historial',
+  path: '/historial',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedInicioRoute = AuthenticatedInicioRouteImport.update({
   id: '/inicio',
   path: '/inicio',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMasRoute = AuthenticatedMasRouteImport.update({
+  id: '/mas',
+  path: '/mas',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMedicacionRoute = AuthenticatedMedicacionRouteImport.update({
+  id: '/medicacion',
+  path: '/medicacion',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMonitorizacionRoute =
+  AuthenticatedMonitorizacionRouteImport.update({
+    id: '/monitorizacion',
+    path: '/monitorizacion',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedNutricionRoute = AuthenticatedNutricionRouteImport.update({
+  id: '/nutricion',
+  path: '/nutricion',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedSaludRoute = AuthenticatedSaludRouteImport.update({
@@ -45,20 +89,41 @@ const AuthenticatedSaludRoute = AuthenticatedSaludRouteImport.update({
   path: '/salud',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedWearableRoute = AuthenticatedWearableRouteImport.update({
+  id: '/wearable',
+  path: '/wearable',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/agenda': typeof AuthenticatedAgendaRoute
+  '/dialisis': typeof AuthenticatedDialisisRoute
+  '/directorio': typeof AuthenticatedDirectorioRoute
+  '/historial': typeof AuthenticatedHistorialRoute
   '/inicio': typeof AuthenticatedInicioRoute
+  '/mas': typeof AuthenticatedMasRoute
+  '/medicacion': typeof AuthenticatedMedicacionRoute
+  '/monitorizacion': typeof AuthenticatedMonitorizacionRoute
+  '/nutricion': typeof AuthenticatedNutricionRoute
   '/salud': typeof AuthenticatedSaludRoute
+  '/wearable': typeof AuthenticatedWearableRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/agenda': typeof AuthenticatedAgendaRoute
+  '/dialisis': typeof AuthenticatedDialisisRoute
+  '/directorio': typeof AuthenticatedDirectorioRoute
+  '/historial': typeof AuthenticatedHistorialRoute
   '/inicio': typeof AuthenticatedInicioRoute
+  '/mas': typeof AuthenticatedMasRoute
+  '/medicacion': typeof AuthenticatedMedicacionRoute
+  '/monitorizacion': typeof AuthenticatedMonitorizacionRoute
+  '/nutricion': typeof AuthenticatedNutricionRoute
   '/salud': typeof AuthenticatedSaludRoute
+  '/wearable': typeof AuthenticatedWearableRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -66,22 +131,64 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/agenda': typeof AuthenticatedAgendaRoute
+  '/_authenticated/dialisis': typeof AuthenticatedDialisisRoute
+  '/_authenticated/directorio': typeof AuthenticatedDirectorioRoute
+  '/_authenticated/historial': typeof AuthenticatedHistorialRoute
   '/_authenticated/inicio': typeof AuthenticatedInicioRoute
+  '/_authenticated/mas': typeof AuthenticatedMasRoute
+  '/_authenticated/medicacion': typeof AuthenticatedMedicacionRoute
+  '/_authenticated/monitorizacion': typeof AuthenticatedMonitorizacionRoute
+  '/_authenticated/nutricion': typeof AuthenticatedNutricionRoute
   '/_authenticated/salud': typeof AuthenticatedSaludRoute
+  '/_authenticated/wearable': typeof AuthenticatedWearableRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/agenda' | '/inicio' | '/salud'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/agenda'
+    | '/dialisis'
+    | '/directorio'
+    | '/historial'
+    | '/inicio'
+    | '/mas'
+    | '/medicacion'
+    | '/monitorizacion'
+    | '/nutricion'
+    | '/salud'
+    | '/wearable'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/agenda' | '/inicio' | '/salud'
+  to:
+    | '/'
+    | '/auth'
+    | '/agenda'
+    | '/dialisis'
+    | '/directorio'
+    | '/historial'
+    | '/inicio'
+    | '/mas'
+    | '/medicacion'
+    | '/monitorizacion'
+    | '/nutricion'
+    | '/salud'
+    | '/wearable'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/agenda'
+    | '/_authenticated/dialisis'
+    | '/_authenticated/directorio'
+    | '/_authenticated/historial'
     | '/_authenticated/inicio'
+    | '/_authenticated/mas'
+    | '/_authenticated/medicacion'
+    | '/_authenticated/monitorizacion'
+    | '/_authenticated/nutricion'
     | '/_authenticated/salud'
+    | '/_authenticated/wearable'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -120,11 +227,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAgendaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dialisis': {
+      id: '/_authenticated/dialisis'
+      path: '/dialisis'
+      fullPath: '/dialisis'
+      preLoaderRoute: typeof AuthenticatedDialisisRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/directorio': {
+      id: '/_authenticated/directorio'
+      path: '/directorio'
+      fullPath: '/directorio'
+      preLoaderRoute: typeof AuthenticatedDirectorioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/historial': {
+      id: '/_authenticated/historial'
+      path: '/historial'
+      fullPath: '/historial'
+      preLoaderRoute: typeof AuthenticatedHistorialRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/inicio': {
       id: '/_authenticated/inicio'
       path: '/inicio'
       fullPath: '/inicio'
       preLoaderRoute: typeof AuthenticatedInicioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/mas': {
+      id: '/_authenticated/mas'
+      path: '/mas'
+      fullPath: '/mas'
+      preLoaderRoute: typeof AuthenticatedMasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/medicacion': {
+      id: '/_authenticated/medicacion'
+      path: '/medicacion'
+      fullPath: '/medicacion'
+      preLoaderRoute: typeof AuthenticatedMedicacionRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/monitorizacion': {
+      id: '/_authenticated/monitorizacion'
+      path: '/monitorizacion'
+      fullPath: '/monitorizacion'
+      preLoaderRoute: typeof AuthenticatedMonitorizacionRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/nutricion': {
+      id: '/_authenticated/nutricion'
+      path: '/nutricion'
+      fullPath: '/nutricion'
+      preLoaderRoute: typeof AuthenticatedNutricionRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/salud': {
@@ -134,19 +290,42 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSaludRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/wearable': {
+      id: '/_authenticated/wearable'
+      path: '/wearable'
+      fullPath: '/wearable'
+      preLoaderRoute: typeof AuthenticatedWearableRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAgendaRoute: typeof AuthenticatedAgendaRoute
+  AuthenticatedDialisisRoute: typeof AuthenticatedDialisisRoute
+  AuthenticatedDirectorioRoute: typeof AuthenticatedDirectorioRoute
+  AuthenticatedHistorialRoute: typeof AuthenticatedHistorialRoute
   AuthenticatedInicioRoute: typeof AuthenticatedInicioRoute
+  AuthenticatedMasRoute: typeof AuthenticatedMasRoute
+  AuthenticatedMedicacionRoute: typeof AuthenticatedMedicacionRoute
+  AuthenticatedMonitorizacionRoute: typeof AuthenticatedMonitorizacionRoute
+  AuthenticatedNutricionRoute: typeof AuthenticatedNutricionRoute
   AuthenticatedSaludRoute: typeof AuthenticatedSaludRoute
+  AuthenticatedWearableRoute: typeof AuthenticatedWearableRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAgendaRoute: AuthenticatedAgendaRoute,
+  AuthenticatedDialisisRoute: AuthenticatedDialisisRoute,
+  AuthenticatedDirectorioRoute: AuthenticatedDirectorioRoute,
+  AuthenticatedHistorialRoute: AuthenticatedHistorialRoute,
   AuthenticatedInicioRoute: AuthenticatedInicioRoute,
+  AuthenticatedMasRoute: AuthenticatedMasRoute,
+  AuthenticatedMedicacionRoute: AuthenticatedMedicacionRoute,
+  AuthenticatedMonitorizacionRoute: AuthenticatedMonitorizacionRoute,
+  AuthenticatedNutricionRoute: AuthenticatedNutricionRoute,
   AuthenticatedSaludRoute: AuthenticatedSaludRoute,
+  AuthenticatedWearableRoute: AuthenticatedWearableRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

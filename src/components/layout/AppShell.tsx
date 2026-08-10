@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { LogOut, Menu, Plus, Sparkles } from "lucide-react";
+import { LogOut, Menu, Mic, Plus, Sparkles } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
 import { AccionRapida } from "@/components/AccionRapida";
@@ -11,7 +11,7 @@ import { useAlertas } from "@/hooks/useAlertas";
 import { usePaciente } from "@/hooks/useCuidados";
 import { usePerfil, useRol, useSesion } from "@/hooks/useSesion";
 import { supabase } from "@/integrations/supabase/client";
-import { NAV, NAV_MOVIL } from "@/lib/navegacion";
+import { MAS_ITEM, NAV, NAV_MOVIL } from "@/lib/navegacion";
 import { capitalizar, edadDesde, iniciales } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -177,9 +177,29 @@ export function AppShell({
 
         <main className="flex-1 px-4 pb-28 pt-4 lg:px-8 lg:pb-12">{children}</main>
 
+        <div className="fixed bottom-24 right-4 z-40 flex flex-col gap-2 lg:bottom-8 lg:right-8">
+          <Button
+            size="icon"
+            variant="secondary"
+            className="size-12 rounded-2xl border border-border shadow-md"
+            onClick={() => setAccionAbierta(true)}
+            aria-label="Registro por voz"
+          >
+            <Mic className="size-5" />
+          </Button>
+          <Button
+            size="icon"
+            className="size-14 rounded-2xl shadow-lg"
+            onClick={() => setAccionAbierta(true)}
+            aria-label="Registro rápido universal"
+          >
+            <Plus className="size-6" />
+          </Button>
+        </div>
+
         <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden">
-          <div className="grid grid-cols-4 items-end">
-            {NAV_MOVIL.slice(0, 2).map((ruta) => {
+          <div className="grid grid-cols-5 items-end">
+            {NAV_MOVIL.map((ruta) => {
               const item = NAV.find((n) => n.to === ruta)!;
               const activo = location.pathname === item.to;
               return (
@@ -187,7 +207,7 @@ export function AppShell({
                   key={item.to}
                   to={item.to}
                   className={cn(
-                    "flex flex-col items-center gap-1 py-2.5 text-[0.68rem] font-medium",
+                    "flex flex-col items-center gap-1 py-2.5 text-[0.62rem] font-medium",
                     activo ? "text-primary" : "text-muted-foreground",
                   )}
                 >
@@ -196,43 +216,19 @@ export function AppShell({
                 </Link>
               );
             })}
-            <div className="flex justify-center">
-              <Button
-                size="icon"
-                className="-mt-5 size-14 rounded-2xl shadow-lg"
-                onClick={() => setAccionAbierta(true)}
-                aria-label="Registro rápido"
-              >
-                <Plus className="size-6" />
-              </Button>
-            </div>
-            {NAV_MOVIL.slice(2).map((ruta) => {
-              const item = NAV.find((n) => n.to === ruta)!;
-              const activo = location.pathname === item.to;
-              return (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  className={cn(
-                    "flex flex-col items-center gap-1 py-2.5 text-[0.68rem] font-medium",
-                    activo ? "text-primary" : "text-muted-foreground",
-                  )}
-                >
-                  <item.icon className="size-5" />
-                  {item.corto}
-                </Link>
-              );
-            })}
+            <Link
+              to={MAS_ITEM.to}
+              className={cn(
+                "flex flex-col items-center gap-1 py-2.5 text-[0.62rem] font-medium",
+                location.pathname === MAS_ITEM.to ? "text-primary" : "text-muted-foreground",
+              )}
+            >
+              <MAS_ITEM.icon className="size-5" />
+              {MAS_ITEM.corto}
+            </Link>
           </div>
         </nav>
 
-        <Button
-          size="lg"
-          className="fixed bottom-8 right-8 z-30 hidden gap-2 rounded-xl shadow-lg lg:inline-flex"
-          onClick={() => setAccionAbierta(true)}
-        >
-          <Plus className="size-5" /> Registro rápido
-        </Button>
 
         <AccionRapida abierta={accionAbierta} onCambio={setAccionAbierta} />
       </div>

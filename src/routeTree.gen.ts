@@ -16,6 +16,7 @@ import { Route as AuthenticatedAgendaRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedDialisisRouteImport } from './routes/_authenticated/dialisis'
 import { Route as AuthenticatedDirectorioRouteImport } from './routes/_authenticated/directorio'
 import { Route as AuthenticatedDocumentosRouteImport } from './routes/_authenticated/documentos'
+import { Route as AuthenticatedGastosRouteImport } from './routes/_authenticated/gastos'
 import { Route as AuthenticatedHistorialRouteImport } from './routes/_authenticated/historial'
 import { Route as AuthenticatedInicioRouteImport } from './routes/_authenticated/inicio'
 import { Route as AuthenticatedInventarioRouteImport } from './routes/_authenticated/inventario'
@@ -58,6 +59,11 @@ const AuthenticatedDirectorioRoute = AuthenticatedDirectorioRouteImport.update({
 const AuthenticatedDocumentosRoute = AuthenticatedDocumentosRouteImport.update({
   id: '/documentos',
   path: '/documentos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedGastosRoute = AuthenticatedGastosRouteImport.update({
+  id: '/gastos',
+  path: '/gastos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedHistorialRoute = AuthenticatedHistorialRouteImport.update({
@@ -114,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/dialisis': typeof AuthenticatedDialisisRoute
   '/directorio': typeof AuthenticatedDirectorioRoute
   '/documentos': typeof AuthenticatedDocumentosRoute
+  '/gastos': typeof AuthenticatedGastosRoute
   '/historial': typeof AuthenticatedHistorialRoute
   '/inicio': typeof AuthenticatedInicioRoute
   '/inventario': typeof AuthenticatedInventarioRoute
@@ -131,6 +138,7 @@ export interface FileRoutesByTo {
   '/dialisis': typeof AuthenticatedDialisisRoute
   '/directorio': typeof AuthenticatedDirectorioRoute
   '/documentos': typeof AuthenticatedDocumentosRoute
+  '/gastos': typeof AuthenticatedGastosRoute
   '/historial': typeof AuthenticatedHistorialRoute
   '/inicio': typeof AuthenticatedInicioRoute
   '/inventario': typeof AuthenticatedInventarioRoute
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/_authenticated/dialisis': typeof AuthenticatedDialisisRoute
   '/_authenticated/directorio': typeof AuthenticatedDirectorioRoute
   '/_authenticated/documentos': typeof AuthenticatedDocumentosRoute
+  '/_authenticated/gastos': typeof AuthenticatedGastosRoute
   '/_authenticated/historial': typeof AuthenticatedHistorialRoute
   '/_authenticated/inicio': typeof AuthenticatedInicioRoute
   '/_authenticated/inventario': typeof AuthenticatedInventarioRoute
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/dialisis'
     | '/directorio'
     | '/documentos'
+    | '/gastos'
     | '/historial'
     | '/inicio'
     | '/inventario'
@@ -186,6 +196,7 @@ export interface FileRouteTypes {
     | '/dialisis'
     | '/directorio'
     | '/documentos'
+    | '/gastos'
     | '/historial'
     | '/inicio'
     | '/inventario'
@@ -204,6 +215,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dialisis'
     | '/_authenticated/directorio'
     | '/_authenticated/documentos'
+    | '/_authenticated/gastos'
     | '/_authenticated/historial'
     | '/_authenticated/inicio'
     | '/_authenticated/inventario'
@@ -270,6 +282,13 @@ declare module '@tanstack/react-router' {
       path: '/documentos'
       fullPath: '/documentos'
       preLoaderRoute: typeof AuthenticatedDocumentosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/gastos': {
+      id: '/_authenticated/gastos'
+      path: '/gastos'
+      fullPath: '/gastos'
+      preLoaderRoute: typeof AuthenticatedGastosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/historial': {
@@ -343,6 +362,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDialisisRoute: typeof AuthenticatedDialisisRoute
   AuthenticatedDirectorioRoute: typeof AuthenticatedDirectorioRoute
   AuthenticatedDocumentosRoute: typeof AuthenticatedDocumentosRoute
+  AuthenticatedGastosRoute: typeof AuthenticatedGastosRoute
   AuthenticatedHistorialRoute: typeof AuthenticatedHistorialRoute
   AuthenticatedInicioRoute: typeof AuthenticatedInicioRoute
   AuthenticatedInventarioRoute: typeof AuthenticatedInventarioRoute
@@ -359,6 +379,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDialisisRoute: AuthenticatedDialisisRoute,
   AuthenticatedDirectorioRoute: AuthenticatedDirectorioRoute,
   AuthenticatedDocumentosRoute: AuthenticatedDocumentosRoute,
+  AuthenticatedGastosRoute: AuthenticatedGastosRoute,
   AuthenticatedHistorialRoute: AuthenticatedHistorialRoute,
   AuthenticatedInicioRoute: AuthenticatedInicioRoute,
   AuthenticatedInventarioRoute: AuthenticatedInventarioRoute,

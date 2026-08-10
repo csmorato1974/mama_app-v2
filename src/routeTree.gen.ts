@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAgendaRouteImport } from './routes/_authenticated/agenda'
+import { Route as AuthenticatedCuidadorRouteImport } from './routes/_authenticated/cuidador'
 import { Route as AuthenticatedDialisisRouteImport } from './routes/_authenticated/dialisis'
 import { Route as AuthenticatedDirectorioRouteImport } from './routes/_authenticated/directorio'
 import { Route as AuthenticatedDocumentosRouteImport } from './routes/_authenticated/documentos'
@@ -46,6 +47,11 @@ const AuthRoute = AuthRouteImport.update({
 const AuthenticatedAgendaRoute = AuthenticatedAgendaRouteImport.update({
   id: '/agenda',
   path: '/agenda',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCuidadorRoute = AuthenticatedCuidadorRouteImport.update({
+  id: '/cuidador',
+  path: '/cuidador',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDialisisRoute = AuthenticatedDialisisRouteImport.update({
@@ -129,6 +135,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/agenda': typeof AuthenticatedAgendaRoute
+  '/cuidador': typeof AuthenticatedCuidadorRoute
   '/dialisis': typeof AuthenticatedDialisisRoute
   '/directorio': typeof AuthenticatedDirectorioRoute
   '/documentos': typeof AuthenticatedDocumentosRoute
@@ -149,6 +156,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/agenda': typeof AuthenticatedAgendaRoute
+  '/cuidador': typeof AuthenticatedCuidadorRoute
   '/dialisis': typeof AuthenticatedDialisisRoute
   '/directorio': typeof AuthenticatedDirectorioRoute
   '/documentos': typeof AuthenticatedDocumentosRoute
@@ -171,6 +179,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/agenda': typeof AuthenticatedAgendaRoute
+  '/_authenticated/cuidador': typeof AuthenticatedCuidadorRoute
   '/_authenticated/dialisis': typeof AuthenticatedDialisisRoute
   '/_authenticated/directorio': typeof AuthenticatedDirectorioRoute
   '/_authenticated/documentos': typeof AuthenticatedDocumentosRoute
@@ -193,6 +202,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/agenda'
+    | '/cuidador'
     | '/dialisis'
     | '/directorio'
     | '/documentos'
@@ -213,6 +223,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/agenda'
+    | '/cuidador'
     | '/dialisis'
     | '/directorio'
     | '/documentos'
@@ -234,6 +245,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/agenda'
+    | '/_authenticated/cuidador'
     | '/_authenticated/dialisis'
     | '/_authenticated/directorio'
     | '/_authenticated/documentos'
@@ -285,6 +297,13 @@ declare module '@tanstack/react-router' {
       path: '/agenda'
       fullPath: '/agenda'
       preLoaderRoute: typeof AuthenticatedAgendaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cuidador': {
+      id: '/_authenticated/cuidador'
+      path: '/cuidador'
+      fullPath: '/cuidador'
+      preLoaderRoute: typeof AuthenticatedCuidadorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dialisis': {
@@ -397,6 +416,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAgendaRoute: typeof AuthenticatedAgendaRoute
+  AuthenticatedCuidadorRoute: typeof AuthenticatedCuidadorRoute
   AuthenticatedDialisisRoute: typeof AuthenticatedDialisisRoute
   AuthenticatedDirectorioRoute: typeof AuthenticatedDirectorioRoute
   AuthenticatedDocumentosRoute: typeof AuthenticatedDocumentosRoute
@@ -416,6 +436,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAgendaRoute: AuthenticatedAgendaRoute,
+  AuthenticatedCuidadorRoute: AuthenticatedCuidadorRoute,
   AuthenticatedDialisisRoute: AuthenticatedDialisisRoute,
   AuthenticatedDirectorioRoute: AuthenticatedDirectorioRoute,
   AuthenticatedDocumentosRoute: AuthenticatedDocumentosRoute,

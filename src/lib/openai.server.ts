@@ -90,12 +90,19 @@ export type RespuestaOpenAI = {
   latenciaMs: number;
 };
 
+export type BloqueEntrada =
+  | { type: "input_text"; text: string }
+  | { type: "input_image"; image_url: string }
+  | { type: "input_file"; filename: string; file_data: string };
+
 export async function llamarOpenAI(opciones: {
   modelo: string;
   instrucciones: string;
   entrada: string;
+  bloques?: BloqueEntrada[];
   maxTokens?: number;
 }): Promise<RespuestaOpenAI> {
+
   const clave = process.env["OPENAI_API_KEY"];
   if (!clave) throw new Error("configuracion_pendiente");
 

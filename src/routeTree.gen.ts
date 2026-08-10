@@ -18,6 +18,7 @@ import { Route as AuthenticatedDirectorioRouteImport } from './routes/_authentic
 import { Route as AuthenticatedDocumentosRouteImport } from './routes/_authenticated/documentos'
 import { Route as AuthenticatedGastosRouteImport } from './routes/_authenticated/gastos'
 import { Route as AuthenticatedHistorialRouteImport } from './routes/_authenticated/historial'
+import { Route as AuthenticatedInformesRouteImport } from './routes/_authenticated/informes'
 import { Route as AuthenticatedInicioRouteImport } from './routes/_authenticated/inicio'
 import { Route as AuthenticatedInventarioRouteImport } from './routes/_authenticated/inventario'
 import { Route as AuthenticatedMasRouteImport } from './routes/_authenticated/mas'
@@ -71,6 +72,11 @@ const AuthenticatedHistorialRoute = AuthenticatedHistorialRouteImport.update({
   path: '/historial',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedInformesRoute = AuthenticatedInformesRouteImport.update({
+  id: '/informes',
+  path: '/informes',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedInicioRoute = AuthenticatedInicioRouteImport.update({
   id: '/inicio',
   path: '/inicio',
@@ -122,6 +128,7 @@ export interface FileRoutesByFullPath {
   '/documentos': typeof AuthenticatedDocumentosRoute
   '/gastos': typeof AuthenticatedGastosRoute
   '/historial': typeof AuthenticatedHistorialRoute
+  '/informes': typeof AuthenticatedInformesRoute
   '/inicio': typeof AuthenticatedInicioRoute
   '/inventario': typeof AuthenticatedInventarioRoute
   '/mas': typeof AuthenticatedMasRoute
@@ -140,6 +147,7 @@ export interface FileRoutesByTo {
   '/documentos': typeof AuthenticatedDocumentosRoute
   '/gastos': typeof AuthenticatedGastosRoute
   '/historial': typeof AuthenticatedHistorialRoute
+  '/informes': typeof AuthenticatedInformesRoute
   '/inicio': typeof AuthenticatedInicioRoute
   '/inventario': typeof AuthenticatedInventarioRoute
   '/mas': typeof AuthenticatedMasRoute
@@ -160,6 +168,7 @@ export interface FileRoutesById {
   '/_authenticated/documentos': typeof AuthenticatedDocumentosRoute
   '/_authenticated/gastos': typeof AuthenticatedGastosRoute
   '/_authenticated/historial': typeof AuthenticatedHistorialRoute
+  '/_authenticated/informes': typeof AuthenticatedInformesRoute
   '/_authenticated/inicio': typeof AuthenticatedInicioRoute
   '/_authenticated/inventario': typeof AuthenticatedInventarioRoute
   '/_authenticated/mas': typeof AuthenticatedMasRoute
@@ -180,6 +189,7 @@ export interface FileRouteTypes {
     | '/documentos'
     | '/gastos'
     | '/historial'
+    | '/informes'
     | '/inicio'
     | '/inventario'
     | '/mas'
@@ -198,6 +208,7 @@ export interface FileRouteTypes {
     | '/documentos'
     | '/gastos'
     | '/historial'
+    | '/informes'
     | '/inicio'
     | '/inventario'
     | '/mas'
@@ -217,6 +228,7 @@ export interface FileRouteTypes {
     | '/_authenticated/documentos'
     | '/_authenticated/gastos'
     | '/_authenticated/historial'
+    | '/_authenticated/informes'
     | '/_authenticated/inicio'
     | '/_authenticated/inventario'
     | '/_authenticated/mas'
@@ -298,6 +310,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHistorialRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/informes': {
+      id: '/_authenticated/informes'
+      path: '/informes'
+      fullPath: '/informes'
+      preLoaderRoute: typeof AuthenticatedInformesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/inicio': {
       id: '/_authenticated/inicio'
       path: '/inicio'
@@ -364,6 +383,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDocumentosRoute: typeof AuthenticatedDocumentosRoute
   AuthenticatedGastosRoute: typeof AuthenticatedGastosRoute
   AuthenticatedHistorialRoute: typeof AuthenticatedHistorialRoute
+  AuthenticatedInformesRoute: typeof AuthenticatedInformesRoute
   AuthenticatedInicioRoute: typeof AuthenticatedInicioRoute
   AuthenticatedInventarioRoute: typeof AuthenticatedInventarioRoute
   AuthenticatedMasRoute: typeof AuthenticatedMasRoute
@@ -381,6 +401,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDocumentosRoute: AuthenticatedDocumentosRoute,
   AuthenticatedGastosRoute: AuthenticatedGastosRoute,
   AuthenticatedHistorialRoute: AuthenticatedHistorialRoute,
+  AuthenticatedInformesRoute: AuthenticatedInformesRoute,
   AuthenticatedInicioRoute: AuthenticatedInicioRoute,
   AuthenticatedInventarioRoute: AuthenticatedInventarioRoute,
   AuthenticatedMasRoute: AuthenticatedMasRoute,

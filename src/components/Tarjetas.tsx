@@ -59,13 +59,17 @@ export function EtiquetaSeveridad({ severidad }: { severidad: string | null }) {
     media: { texto: "Media", clase: "bg-warning/15 text-warning-foreground border-warning/30" },
     baja: { texto: "Baja", clase: "bg-success/12 text-success border-success/25" },
   };
-  const item = mapa[severidad ?? "baja"] ?? mapa.baja;
+  const item = mapa[severidad ?? "baja"] ?? {
+    texto: "Baja",
+    clase: "bg-success/12 text-success border-success/25",
+  };
   return (
     <Badge variant="outline" className={cn("shrink-0", item.clase)}>
       {item.texto}
     </Badge>
   );
 }
+
 
 export function FilaDato({ etiqueta, valor }: { etiqueta: string; valor: ReactNode }) {
   return (

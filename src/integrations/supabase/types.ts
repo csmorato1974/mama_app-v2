@@ -575,6 +575,7 @@ export type Database = {
           moneda: string
           notas: string | null
           proveedor: string | null
+          realizado_por: string | null
           updated_at: string
         }
         Insert: {
@@ -591,6 +592,7 @@ export type Database = {
           moneda?: string
           notas?: string | null
           proveedor?: string | null
+          realizado_por?: string | null
           updated_at?: string
         }
         Update: {
@@ -607,6 +609,7 @@ export type Database = {
           moneda?: string
           notas?: string | null
           proveedor?: string | null
+          realizado_por?: string | null
           updated_at?: string
         }
         Relationships: [

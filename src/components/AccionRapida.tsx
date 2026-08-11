@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Mic, Sparkles, Square } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -90,11 +90,6 @@ export function AccionRapida({
   const [textoIAGasto, setTextoIAGasto] = useState("");
   const [procesandoIAGasto, setProcesandoIAGasto] = useState(false);
 
-  useEffect(() => {
-    if (user?.id && !gasto.realizadoPor) {
-      setGasto((actual) => ({ ...actual, realizadoPor: user.id }));
-    }
-  }, [user?.id, gasto.realizadoPor]);
   const [nota, setNota] = useState({ titulo: "", descripcion: "" });
 
   const refrescar = (claves: string[]) => {

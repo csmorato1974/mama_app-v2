@@ -40,7 +40,7 @@ jobs:
 
       - name: Crear proyecto Android
         env:
-          CAPACITOR_SERVER_URL: https://preview--renal-app.lovable.app
+          CAPACITOR_SERVER_URL: https://renal-app.lovable.app
         run: npx cap add android
 
       - name: Sincronizar aplicación web con Android

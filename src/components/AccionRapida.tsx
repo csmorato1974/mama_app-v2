@@ -265,6 +265,7 @@ export function AccionRapida({
     if (resultado.gasto) {
       const g = resultado.gasto;
       setGasto((prev) => ({
+        ...prev,
         concepto: g.concepto ?? prev.concepto,
         categoria: g.categoria ?? prev.categoria,
         importe: g.importe?.toString() ?? prev.importe,

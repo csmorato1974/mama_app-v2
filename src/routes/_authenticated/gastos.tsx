@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { Sparkles } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { toast } from "sonner";
 
@@ -13,10 +14,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useGastos } from "@/hooks/useCuidados";
 import { useSesion } from "@/hooks/useSesion";
 import { supabase } from "@/integrations/supabase/client";
 import { ISO_HOY, bolivianos, capitalizar, fechaCorta } from "@/lib/format";
+import { interpretarRegistro } from "@/lib/ia.functions";
 
 export const Route = createFileRoute("/_authenticated/gastos")({
   head: () => ({
@@ -32,6 +35,19 @@ export const Route = createFileRoute("/_authenticated/gastos")({
   }),
   component: Gastos,
 });
+
+const CATEGORIAS_GASTO = [
+  "medicamentos",
+  "laboratorio",
+  "medicos",
+  "enfermeria",
+  "transporte",
+  "alimentacion",
+  "suministros",
+  "dialisis",
+  "tramites",
+  "otros",
+];
 
 type Persona = { id: string; nombre: string };
 
@@ -58,6 +74,8 @@ function NuevoGasto({
 }) {
   const queryClient = useQueryClient();
   const [abierta, setAbierta] = useState(false);
+  const [textoIA, setTextoIA] = useState("");
+  const [procesandoIA, setProcesandoIA] = useState(false);
   const [form, setForm] = useState({
     fecha: ISO_HOY(),
     concepto: "",
@@ -73,6 +91,33 @@ function NuevoGasto({
       setForm((actual) => ({ ...actual, realizadoPor: usuarioActualId }));
     }
   }, [usuarioActualId, form.realizadoPor]);
+
+  async function rellenarConIA() {
+    if (!textoIA.trim()) {
+      toast.info("Escribe una descripción para que la IA rellene el gasto.");
+      return;
+    }
+    setProcesandoIA(true);
+    try {
+      const resultado = await interpretarRegistro({ data: { texto: textoIA.trim() } });
+      if (!resultado.gasto) {
+        toast.warning("La IA no identificó un gasto en el texto.");
+        return;
+      }
+      setForm((actual) => ({
+        ...actual,
+        concepto: resultado.gasto?.concepto ?? actual.concepto,
+        categoria: resultado.gasto?.categoria ?? actual.categoria,
+        importe: resultado.gasto?.importe?.toString() ?? actual.importe,
+        proveedor: resultado.gasto?.proveedor ?? actual.proveedor,
+      }));
+      toast.success("Campos del gasto rellenados. Revisa antes de guardar.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo rellenar el gasto con IA.");
+    } finally {
+      setProcesandoIA(false);
+    }
+  }
 
   const guardar = useMutation({
     mutationFn: async () => {
@@ -108,6 +153,25 @@ function NuevoGasto({
         <SheetHeader className="text-left">
           <SheetTitle>Registrar gasto (Bs)</SheetTitle>
         </SheetHeader>
+        <div className="rounded-xl border border-primary/20 bg-primary/5 p-3">
+          <div className="flex items-center gap-2">
+            <Sparkles className="size-4 text-primary" />
+            <p className="text-sm font-medium">Rellenar con IA</p>
+          </div>
+          <div className="mt-2 flex gap-2">
+            <Input
+              value={textoIA}
+              onChange={(e) => setTextoIA(e.target.value)}
+              placeholder="Ej.: farmacia, 120 Bs, medicamentos"
+            />
+            <Button type="button" variant="outline" onClick={rellenarConIA} disabled={procesandoIA} className="shrink-0 gap-1">
+              {procesandoIA ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
+              Completar
+            </Button>
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">Revisa siempre los datos antes de guardar.</p>
+        </div>
+
         <div className="grid grid-cols-2 gap-3 px-4 pb-8 pt-4">
           <div className="space-y-1.5">
             <Label htmlFor="fecha">Fecha</Label>
@@ -137,11 +201,16 @@ function NuevoGasto({
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="categoria">Categoría</Label>
-            <Input
-              id="categoria"
-              value={form.categoria}
-              onChange={(e) => setForm({ ...form, categoria: e.target.value })}
-            />
+            <Select value={form.categoria} onValueChange={(valor) => setForm({ ...form, categoria: valor })}>
+              <SelectTrigger id="categoria"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {CATEGORIAS_GASTO.map((categoria) => (
+                  <SelectItem key={categoria} value={categoria}>
+                    {categoria.charAt(0).toUpperCase() + categoria.slice(1)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="prov">Proveedor</Label>

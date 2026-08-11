@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Mic, Sparkles, Square } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -265,6 +265,7 @@ export function AccionRapida({
     if (resultado.gasto) {
       const g = resultado.gasto;
       setGasto((prev) => ({
+        ...prev,
         concepto: g.concepto ?? prev.concepto,
         categoria: g.categoria ?? prev.categoria,
         importe: g.importe?.toString() ?? prev.importe,

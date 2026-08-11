@@ -128,15 +128,20 @@ function Paciente() {
       if (campo === "peso_seco") cambios[campo] = valor === "" ? null : Number(valor);
       else cambios[campo] = valor === "" ? null : valor;
     }
-    const { error } = await supabase
+    const { data: actualizado, error } = await supabase
       .from("pacientes")
       .update(cambios as never)
-      .eq("id", PACIENTE_ID);
+      .eq("id", PACIENTE_ID)
+      .select("id")
+      .maybeSingle();
 
     setGuardando(false);
     setConfirmar(false);
-    if (error) {
-      toast.error("No se pudo guardar. Puede que tu rol no tenga permiso de edición.");
+    if (error || !actualizado) {
+      toast.error(
+        error?.message ??
+          "No se guardaron cambios. Revisa que tu rol tenga permiso de edición y que exista la ficha.",
+      );
       return;
     }
     void registrarAuditoria({

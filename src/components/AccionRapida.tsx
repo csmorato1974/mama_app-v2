@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Mic, Square } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useGrabadoraVoz } from "@/hooks/useGrabadora";
 import { supabase } from "@/integrations/supabase/client";
+import { useSesion } from "@/hooks/useSesion";
 import { interpretarRegistro, transcribirNota, type RegistroInterpretado } from "@/lib/ia.functions";
 import { ISO_HOY } from "@/lib/format";
 
@@ -47,6 +48,15 @@ export function AccionRapida({
   onCambio: (valor: boolean) => void;
 }) {
   const queryClient = useQueryClient();
+  const { user } = useSesion();
+  const { data: personas } = useQuery({
+    queryKey: ["personas-gasto"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("profiles").select("id, nombre").order("nombre");
+      if (error) throw error;
+      return (data ?? []) as Array<{ id: string; nombre: string }>;
+    },
+  });
   const { grabando, error: errorVoz, iniciar, detener } = useGrabadoraVoz();
   const [transcripcion, setTranscripcion] = useState("");
   const [procesando, setProcesando] = useState(false);
@@ -68,7 +78,23 @@ export function AccionRapida({
     aspecto_liquido: "claro",
     incidencias: "",
   });
-  const [gasto, setGasto] = useState({ concepto: "", categoria: "medicamentos", importe: "", proveedor: "" });
+  const [gasto, setGasto] = useState({
+    fecha: ISO_HOY(),
+    concepto: "",
+    categoria: "medicamentos",
+    importe: "",
+    proveedor: "",
+    notas: "",
+    realizadoPor: "",
+  });
+  const [textoIAGasto, setTextoIAGasto] = useState("");
+  const [procesandoIAGasto, setProcesandoIAGasto] = useState(false);
+
+  useEffect(() => {
+    if (user?.id && !gasto.realizadoPor) {
+      setGasto((actual) => ({ ...actual, realizadoPor: user.id }));
+    }
+  }, [user?.id, gasto.realizadoPor]);
   const [nota, setNota] = useState({ titulo: "", descripcion: "" });
 
   const refrescar = (claves: string[]) => {
@@ -125,11 +151,15 @@ export function AccionRapida({
   const guardarGasto = useMutation({
     mutationFn: async () => {
       const { error } = await supabase.from("gastos").insert({
-        fecha: ISO_HOY(),
+        fecha: gasto.fecha,
         categoria: gasto.categoria,
         concepto: gasto.concepto,
         proveedor: gasto.proveedor || null,
+        notas: gasto.notas || null,
         importe: num(gasto.importe) ?? 0,
+        moneda: "BOB",
+        created_by: user?.id ?? null,
+        realizado_por: gasto.realizadoPor || null,
       });
       if (error) throw error;
     },
@@ -140,6 +170,33 @@ export function AccionRapida({
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  async function rellenarGastoConIA() {
+    if (!textoIAGasto.trim()) {
+      toast.info("Escribe una descripción para que la IA rellene el gasto.");
+      return;
+    }
+    setProcesandoIAGasto(true);
+    try {
+      const resultado = await interpretarRegistro({ data: { texto: textoIAGasto.trim() } });
+      if (!resultado.gasto) {
+        toast.warning("La IA no identificó un gasto en el texto.");
+        return;
+      }
+      setGasto((actual) => ({
+        ...actual,
+        concepto: resultado.gasto?.concepto ?? actual.concepto,
+        categoria: resultado.gasto?.categoria ?? actual.categoria,
+        importe: resultado.gasto?.importe?.toString() ?? actual.importe,
+        proveedor: resultado.gasto?.proveedor ?? actual.proveedor,
+      }));
+      toast.success("Campos del gasto rellenados. Revisa antes de guardar.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo rellenar el gasto con IA.");
+    } finally {
+      setProcesandoIAGasto(false);
+    }
+  }
 
   const guardarNota = useMutation({
     mutationFn: async () => {
@@ -436,6 +493,28 @@ export function AccionRapida({
             </TabsContent>
 
             <TabsContent value="gasto" className="space-y-3 pt-4">
+              <div className="rounded-xl border border-primary/20 bg-primary/5 p-3">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="size-4 text-primary" />
+                  <p className="text-sm font-medium">Rellenar con IA</p>
+                </div>
+                <div className="mt-2 flex gap-2">
+                  <Input
+                    value={textoIAGasto}
+                    onChange={(e) => setTextoIAGasto(e.target.value)}
+                    placeholder="Ej.: farmacia, 120 Bs, medicamentos"
+                  />
+                  <Button type="button" variant="outline" onClick={rellenarGastoConIA} disabled={procesandoIAGasto} className="shrink-0 gap-1">
+                    {procesandoIAGasto ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
+                    Completar
+                  </Button>
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">Revisa siempre los datos antes de guardar.</p>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="gasto-fecha">Fecha</Label>
+                <Input id="gasto-fecha" type="date" value={gasto.fecha} onChange={(e) => setGasto({ ...gasto, fecha: e.target.value })} />
+              </div>
               <div className="space-y-1.5">
                 <Label htmlFor="concepto">Concepto</Label>
                 <Input
@@ -477,6 +556,24 @@ export function AccionRapida({
                   value={gasto.proveedor}
                   onChange={(e) => setGasto({ ...gasto, proveedor: e.target.value })}
                 />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="gasto-realizado">Quién hizo el gasto</Label>
+                <Select value={gasto.realizadoPor} onValueChange={(v) => setGasto({ ...gasto, realizadoPor: v })}>
+                  <SelectTrigger id="gasto-realizado"><SelectValue placeholder="No especificado" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">No especificado</SelectItem>
+                    {(personas ?? []).map((persona) => (
+                      <SelectItem key={persona.id} value={persona.id}>
+                        {persona.id === user?.id ? `${persona.nombre} (yo)` : persona.nombre}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="gasto-notas">Notas</Label>
+                <Textarea id="gasto-notas" rows={2} value={gasto.notas} onChange={(e) => setGasto({ ...gasto, notas: e.target.value })} />
               </div>
               <Button
                 className="w-full"

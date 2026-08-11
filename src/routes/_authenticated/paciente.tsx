@@ -138,9 +138,9 @@ function Paciente() {
     setGuardando(false);
     setConfirmar(false);
     if (error || !actualizado) {
+      const detalle = error?.message ? ` Detalle: ${error.message}` : "";
       toast.error(
-        error?.message ??
-          "No se guardaron cambios. Revisa que tu rol tenga permiso de edición y que exista la ficha.",
+        `No se guardaron cambios. Revisa los permisos de edición y que exista la ficha.${detalle}`,
       );
       return;
     }

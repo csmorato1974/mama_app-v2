@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Loader2, Mic, Square } from "lucide-react";
+import { Loader2, Mic, Sparkles, Square } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -159,7 +159,7 @@ export function AccionRapida({
         importe: num(gasto.importe) ?? 0,
         moneda: "BOB",
         created_by: user?.id ?? null,
-        realizado_por: gasto.realizadoPor || null,
+        realizado_por: gasto.realizadoPor && gasto.realizadoPor !== "__none__" ? gasto.realizadoPor : null,
       });
       if (error) throw error;
     },
@@ -559,10 +559,10 @@ export function AccionRapida({
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="gasto-realizado">Quién hizo el gasto</Label>
-                <Select value={gasto.realizadoPor} onValueChange={(v) => setGasto({ ...gasto, realizadoPor: v })}>
+                <Select value={gasto.realizadoPor || "__none__"} onValueChange={(v) => setGasto({ ...gasto, realizadoPor: v === "__none__" ? "" : v })}>
                   <SelectTrigger id="gasto-realizado"><SelectValue placeholder="No especificado" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No especificado</SelectItem>
+                    <SelectItem value="__none__">No especificado</SelectItem>
                     {(personas ?? []).map((persona) => (
                       <SelectItem key={persona.id} value={persona.id}>
                         {persona.id === user?.id ? `${persona.nombre} (yo)` : persona.nombre}

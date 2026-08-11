@@ -33,13 +33,19 @@ jobs:
       - name: Instalar Capacitor para la compilación
         run: npm install --no-save @capacitor/core@8.4.2 @capacitor/android@8.4.2 @capacitor/cli@8.4.2
 
-      - name: Construir la aplicación web
-        run: npm run build
+      - name: Preparar contenedor web
+        run: |
+          mkdir -p android-web
+          printf '%s\n' '<!doctype html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body></body></html>' > android-web/index.html
 
       - name: Crear proyecto Android
+        env:
+          CAPACITOR_SERVER_URL: https://preview--renal-app.lovable.app
         run: npx cap add android
 
       - name: Sincronizar aplicación web con Android
+        env:
+          CAPACITOR_SERVER_URL: https://preview--renal-app.lovable.app
         run: npx cap sync android
 
       - name: Generar APK de prueba
